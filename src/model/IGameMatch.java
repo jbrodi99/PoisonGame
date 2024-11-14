@@ -9,8 +9,8 @@ public interface IGameMatch {
     IDeck getDeck();
     ICenterStack getCenter(TYPECARD type);
     STATUS getStatus();
+    //int getTurnsPerRound();
     void addPlayer(String userName,int id);
     void nextTurn();
     void nextRound();
-    void dealHand();
 }
