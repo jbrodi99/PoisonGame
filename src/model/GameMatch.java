@@ -96,6 +96,11 @@ public class GameMatch implements IGameMatch{
         //notificarObservadores(EVENT.NEXT_ROUND);
     }
 
+    @Override
+    public boolean checkRound() {
+        return turnsPlayed == movesPerRound;
+    }
+    
     /*Private Methods of GameMatch...*/
 
     private void whoStart() {

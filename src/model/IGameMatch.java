@@ -13,4 +13,5 @@ public interface IGameMatch {
     void addPlayer(String userName,int id);
     void nextTurn();
     void nextRound();
+    boolean checkRound();
 }
