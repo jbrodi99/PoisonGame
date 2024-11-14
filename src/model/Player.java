@@ -25,7 +25,7 @@ public class Player implements IPlayer{
 
     @Override
     public List<Card> viewHand() {
-        return getHand();
+        return new ArrayList<>(getHand());
     }
 
     @Override
@@ -84,6 +84,11 @@ public class Player implements IPlayer{
 
     public Boolean getTurn() {
         return turn;
+    }
+
+    @Override
+    public boolean hasID(int id) {
+        return (getId().compareTo(id) == 0);
     }
 
     public List<Card> getHand() {

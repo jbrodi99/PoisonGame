@@ -24,7 +24,7 @@ public class LogTest {
 
     @Test
     public void signInTest() {
-        IGame game = GameMatch.getInstance();
+        IGameMatch game = GameMatch.getInstance();
         ILog log = Log.getInstance();
         Integer id3 = log.signUp("lola");
         assertTrue(id3.equals(0));
