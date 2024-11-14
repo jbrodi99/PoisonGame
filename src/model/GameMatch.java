@@ -13,8 +13,12 @@ public class GameMatch implements IGameMatch{
     private List<ICenterStack> stacks;
     private Queue<IPlayer> queueTurns;
     private int limitPoints;
-    private int currentTurn;
     private int numOfPlayers;
+    private int currentTurn;
+    private int rounds;
+    private int movesPerRound;
+    private int turnsPlayed = 0;
+    private final int MOVES_PER_TURN = 4;
 
     public static IGameMatch getInstance(){
         if(instance == null){
@@ -26,7 +30,6 @@ public class GameMatch implements IGameMatch{
     private GameMatch(){
         this.stacks = new ArrayList<>();
         this.queueTurns = new LinkedList<>();
-        this.deck = Deck.getInstance();
         this.stacks.add(new CenterStack(TYPECARD.SWORD,new ValidatorSwordType()));
         this.stacks.add(new CenterStack(TYPECARD.GOBLET,new ValidatorGobletType()));
         this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN,new ValidatorGoldenCoinType()));
@@ -63,11 +66,11 @@ public class GameMatch implements IGameMatch{
         return statusGame;
     }
 
-
-
     @Override
     public void addPlayer(String userName, int id) {
-        queueTurns.offer(new Player(id,userName));
+        if(queueTurns.size() < numOfPlayers){
+            queueTurns.offer(new Player(id,userName));
+        }
     }
 
     @Override
@@ -78,22 +81,19 @@ public class GameMatch implements IGameMatch{
     @Override
     public void nextTurn() {
         queueTurns.offer(queueTurns.poll());
-        //notify next turn
+        turnsPlayed++;
+        //notificar Ronda jugada
+        //notificarObservadores(EVENT.NEXT_TURN);
         /*Terminar de definir que acciones realizar desde el juego cuando se juega un turno*/
     }
 
     @Override
     public void nextRound() {
-
-    }
-
-    @Override
-    public void dealHand() {
-        for (int i = 0; i < numOfPlayers; i++) {
-            for (IPlayer p : queueTurns){
-                p.receiveCard(getDeck().removeTopCard());
-            }
-        }
+        turnsPlayed = 0;
+        rounds--;
+        dealHand();
+        //notificar siguiente Ronda
+        //notificarObservadores(EVENT.NEXT_ROUND);
     }
 
     /*Private Methods of GameMatch...*/
@@ -106,5 +106,25 @@ public class GameMatch implements IGameMatch{
 
     private void setStatusGame(STATUS newStatus){
         this.statusGame = newStatus;
+    }
+
+    private void setRounds(){
+        if(numOfPlayers > 0){
+            this.rounds =  NUMBER.values().length / numOfPlayers;   // 6 or 4 or 3
+        }
+    }
+
+    private void setTurnsPerRound(){
+        if(numOfPlayers > 0){
+            this.movesPerRound = MOVES_PER_TURN * numOfPlayers;
+        }
+    }
+
+    private void dealHand() {
+        for (int i = 0; i < numOfPlayers; i++) {
+            for (IPlayer p : queueTurns){
+                p.receiveCard(getDeck().removeTopCard());
+            }
+        }
     }
 }
