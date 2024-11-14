@@ -12,9 +12,10 @@ public class Player implements IPlayer{
     private List<Card> hand = new ArrayList<>();
     private List<Card> graveyard = new ArrayList<>();
 
-    public Player(Integer id, String userName){
+    public Player(Integer id, String userName, int health){
         this.id = id;
         this.userName = userName;
+        this.health = health;
         this.turn = false;
     }
 
@@ -52,6 +53,9 @@ public class Player implements IPlayer{
             return;
         }
         this.health -= poison;
+        //(evento)
+        //Notificar evento PLAYER_RECEIVE_DAMAGE
+        //notificarObservadores(EVENT.PLAYER_RECEIVE_DAMAGE);
     }
 
     @Override
@@ -60,6 +64,9 @@ public class Player implements IPlayer{
         while(!centerStack.isEmpty()){
             gr.add(centerStack.removeTopCard());
         }
+        //(event)
+        //Notificar evento PLAYER_TAKE_HEAP
+        //notificarObservadores(EVENT.PLAYER_TAKE_HEAP);
     }
 
     public Integer getId() {

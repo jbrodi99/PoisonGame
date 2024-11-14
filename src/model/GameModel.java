@@ -8,7 +8,7 @@ public class GameModel implements IGameModel {
     private IGameMatch gameMatch;
 
     private GameModel(){
-        //instancio log, ranking y partida, pero creo que se deberian recuperar con objetos seriealizados
+        //instanciar log, ranking y partida, pero creo que se deberían recuperar con objetos serializados
         log = Log.getInstance();
         ranking = Ranking.getInstance();
         gameMatch = GameMatch.getInstance();
@@ -38,6 +38,12 @@ public class GameModel implements IGameModel {
     public void initGame(int limitPoints, int numOfPlayers) {
 
     }
+
+    @Override
+    public void startGame() {
+        //comienza cuando todos los jugadores estan conectados
+    }
+
 
     @Override
     public void loadGame() {

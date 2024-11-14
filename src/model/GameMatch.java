@@ -14,7 +14,6 @@ public class GameMatch implements IGameMatch{
     private Queue<IPlayer> queueTurns;
     private int limitPoints;
     private int numOfPlayers;
-    private int currentTurn;
     private int rounds;
     private int movesPerRound;
     private int turnsPlayed = 0;
@@ -67,10 +66,25 @@ public class GameMatch implements IGameMatch{
     }
 
     @Override
-    public void addPlayer(String userName, int id) {
+    public int getConnectedPlayers() {
+        return queueTurns.size();
+    }
+
+    @Override
+    public void connectPlayer(String userName, int id, int health) {
         if(queueTurns.size() < numOfPlayers){
-            queueTurns.offer(new Player(id,userName));
+            queueTurns.offer(new Player(id,userName, health));
+            //Notificar evento CONNECT PLAYER
+            //notificarObservadores(EVENT.CONNECT_PLAYER);
         }
+    }
+
+    @Override
+    public void disconnectPlayer(int id) {
+        IPlayer player = getPlayerByID(id);
+        queueTurns.remove(player);
+        //Notificar evento DISCONNECT PLAYER
+        //notificarObservadores(EVENT.DISCONNECT_PLAYER);
     }
 
     @Override
@@ -100,12 +114,20 @@ public class GameMatch implements IGameMatch{
     public boolean checkRound() {
         return turnsPlayed == movesPerRound;
     }
-    
+
+    @Override
+    public boolean isAllPlayersConnect() {
+        return numOfPlayers == queueTurns.size();
+    }
+
     /*Private Methods of GameMatch...*/
 
     private void whoStart() {
         if(numOfPlayers > 0){
-            this.currentTurn =(int) (Math.random() * (numOfPlayers - 1 + 1)) + 1;
+            int firstTurn = (int) (Math.random() * (numOfPlayers - 1 + 1)) + 1;
+            for (int i = 0; i < firstTurn - 1; i++) {
+                queueTurns.offer(queueTurns.poll());
+            }
         }
     }
 
