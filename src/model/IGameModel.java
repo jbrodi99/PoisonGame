@@ -5,6 +5,7 @@ public interface IGameModel {
     IRanking getRanking();
     IGameMatch getGameMatch();
     void initGame(int limitPoints, int numOfPlayers);
+    void startGame();
     void loadGame();
     void saveGame();
     void checkPlay();
