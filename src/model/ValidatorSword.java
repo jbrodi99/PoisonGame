@@ -1,9 +1,9 @@
 package model;
 
-public class ValidatorSwordType implements IValidatorType{
+public class ValidatorSword implements IValidator<Card> {
 
     @Override
-    public Boolean validType(Card card) {
+    public Boolean validate(Card card) {
         TYPECARD type = card.getTypeCard();
         return type == TYPECARD.SWORD || type == TYPECARD.CUP;
     }

@@ -8,7 +8,7 @@ public class GameModel implements IGameModel {
     private IGameMatch gameMatch;
 
     private GameModel(){
-        //instanciar log, ranking y partida, pero creo que se deberían recuperar con objetos serializados
+        //instanciar log, ranking y partida, pero creo que se deberían recuperar con objetos serializados, chequear...
         log = Log.getInstance();
         ranking = Ranking.getInstance();
         gameMatch = GameMatch.getInstance();
@@ -34,32 +34,46 @@ public class GameModel implements IGameModel {
         return gameMatch;
     }
 
+
     @Override
     public void startGame() {
-        //comienza cuando todos los jugadores estan conectados
-        if(gameMatch.isAllPlayersConnect()){
-            gameMatch.whoStart();
-            gameMatch.setStatusGame(STATUS.RUNNING);
-            //event
-            //Notificar evento ALL_PLAYERS_CONNECT
-            //notificarObservadores(EVENT.ALL_PLAYERS_CONNECT);
-        }
-    }
-
-    @Override
-    public void loadGame() {
-        //cargar partida
-        gameMatch.setStatusGame(STATUS.RUNNING);
-    }
-
-    @Override
-    public void saveGame() {
-        //guardar partida
-        gameMatch.setStatusGame(STATUS.STOPED);
+        getGameMatch().startGame();
     }
 
     @Override
     public void endGame() {
-        //gameMatch.setStatusGame(STATUS.END);
+        getGameMatch().endGame();
     }
+
+    @Override
+    public void initGame(int limitPoints, int numOfPlayers) {
+        getGameMatch().initGame(limitPoints,numOfPlayers);
+    }
+
+    @Override
+    public void connectPlayer(String userName, int id, int health) {
+        getGameMatch().connectPlayer(userName,id,health);
+    }
+
+    @Override
+    public void disconnectPlayer(int id) {
+        getGameMatch().disconnectPlayer(id);
+    }
+
+    @Override
+    public boolean isAllPlayersConnect() {
+        return getGameMatch().isAllPlayersConnect();
+    }
+
+    @Override
+    public void nextTurn() {
+        getGameMatch().nextTurn();
+    }
+
+    @Override
+    public void nextRound() {
+        getGameMatch().nextRound();
+    }
+
+
 }

@@ -5,16 +5,16 @@ import java.util.Stack;
 public class CenterStack implements ICenterStack {
 
     private final double MAX_CARDS_VALUE = 13.0;
-    private IValidatorType validatorType;
+    private IValidator validatorType;
     private Stack<Card> cards = new Stack<>();
     private TYPECARD typecard;
 
-    public CenterStack(TYPECARD typecard, IValidatorType validatorType){
+    public CenterStack(TYPECARD typecard, IValidator validatorType){
         this.typecard = typecard;
         setValidator(validatorType);
     }
 
-    public void setValidator(IValidatorType validatorType){
+    public void setValidator(IValidator validatorType){
         this.validatorType = validatorType;
     }
 

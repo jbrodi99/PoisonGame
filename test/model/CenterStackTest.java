@@ -8,7 +8,7 @@ public class CenterStackTest {
 
     @Test
     public void isOverflowingTest() {
-        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSwordType());
+        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
         assertFalse(center.isOverflowing());
         center.addCard(new Card(NUMBER.NINE,TYPECARD.SWORD));   // count : 9
         assertFalse(center.isOverflowing());
@@ -28,7 +28,7 @@ public class CenterStackTest {
 
     @Test
     public void countCardsTest() {
-        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSwordType());
+        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
         center.addCard(new Card(NUMBER.ELEVEN,TYPECARD.SWORD)); // 1
         center.addCard(new Card(NUMBER.TWELVE,TYPECARD.SWORD)); // 2
         assertTrue(center.countCards().equals(2));
@@ -38,7 +38,7 @@ public class CenterStackTest {
 
     @Test
     public void addCardTest() {
-        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSwordType());
+        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
         Card card = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
         center.addCard(card);
         assertEquals(card,center.removeTopCard());
@@ -46,7 +46,7 @@ public class CenterStackTest {
 
     @Test
     public void isEmptyTest() {
-        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSwordType());
+        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
         assertTrue(center.isEmpty());
         Card card = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
         center.addCard(card);
@@ -55,7 +55,7 @@ public class CenterStackTest {
 
     @Test
     public void removeTopCardTest() {
-        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSwordType());
+        CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
         Card card0 = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
         center.addCard(card0);
         Card card1 = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);

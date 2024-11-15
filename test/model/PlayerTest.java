@@ -57,7 +57,7 @@ public class PlayerTest {
         Card card2 = new Card(NUMBER.ONE, TYPECARD.CUP);
         Card card3 = new Card(NUMBER.ONE, TYPECARD.CUP);
         Card card4 = new Card(NUMBER.ONE, TYPECARD.SWORD);
-        CenterStack center = new CenterStack(TYPECARD.SWORD,new ValidatorSwordType());
+        CenterStack center = new CenterStack(TYPECARD.SWORD,new ValidatorSword());
         center.addCard(card1);
         center.addCard(card2);
         center.addCard(card3);
@@ -84,7 +84,7 @@ public class PlayerTest {
         Card card2 = new Card(NUMBER.ONE, TYPECARD.CUP);
         Card card3 = new Card(NUMBER.ONE, TYPECARD.CUP);
         Card card4 = new Card(NUMBER.ONE, TYPECARD.SWORD);
-        CenterStack center = new CenterStack(TYPECARD.SWORD,new ValidatorSwordType());
+        CenterStack center = new CenterStack(TYPECARD.SWORD,new ValidatorSword());
         center.addCard(card1);
         center.addCard(card2);
         center.addCard(card3);

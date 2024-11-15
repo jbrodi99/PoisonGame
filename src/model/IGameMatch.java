@@ -1,22 +1,16 @@
 package model;
 
-import java.util.List;
+import java.util.Queue;
 
-public interface IGameMatch {
-    IPlayer getCurrentPlayer();
-    IPlayer getPlayerByID(int id);
-    List<IPlayer> getAllPlayers();
+public interface IGameMatch extends IModelGameManagement,IModelPlayerManager, IModelRoundManager{
     IDeck getDeck();
+    void setDeck(IDeck deck);
     ICenterStack getCenter(TYPECARD type);
     STATUS getStatus();
-    void initGame(int limitPoints, int numOfPlayers);
     void setStatusGame(STATUS statusGame);
-    int getConnectedPlayers();
-    void connectPlayer(String userName, int id, int health);
-    void disconnectPlayer(int id);
-    void nextTurn();
-    void nextRound();
-    boolean checkRound();
-    int whoStart();
-    boolean isAllPlayersConnect();
+    Queue<IPlayer> getQueueTurns();
+    void setNumOfPlayers(int nop);
+    int getNumOfPLayers();
+    int getLimitPoints();
+    void setLimitPoints(int limitPoints);
 }
