@@ -18,6 +18,10 @@ public class GameMatch implements IGameMatch{
     private int movesPerRound;
     private int turnsPlayed = 0;
     private final int MOVES_PER_TURN = 4;
+    private final int MIN_POINTS = 0;
+    private final int MAX_POINTS = 50;
+    private final int MIX_PLAYERS = 2;
+    private final int MAX_PLAYERS = 4;
 
     public static IGameMatch getInstance(){
         if(instance == null){
@@ -34,6 +38,8 @@ public class GameMatch implements IGameMatch{
         this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN,new ValidatorGoldenCoinType()));
         this.statusGame = STATUS.NOT_INIT;
     }
+
+
 
     @Override
     public IPlayer getPlayerByID(int id) {
@@ -66,6 +72,24 @@ public class GameMatch implements IGameMatch{
     }
 
     @Override
+    public void initGame(int limitPoints, int numOfPlayers) {
+        if(getStatus() == STATUS.NOT_INIT){
+            if(validLimitPoints(limitPoints)){
+                //sino lanzar exception
+                this.limitPoints = limitPoints;
+            }
+            if(validNumOfPlayers(numOfPlayers)){
+                //sino lanzar exception
+                this.numOfPlayers = numOfPlayers;
+            }
+            this.deck = Deck.getInstance();
+            setTurnsPerRound();
+            setRounds();
+            setStatusGame(STATUS.INITIALIZED);
+        }
+    }
+
+    @Override
     public int getConnectedPlayers() {
         return queueTurns.size();
     }
@@ -74,7 +98,7 @@ public class GameMatch implements IGameMatch{
     public void connectPlayer(String userName, int id, int health) {
         if(queueTurns.size() < numOfPlayers){
             queueTurns.offer(new Player(id,userName, health));
-            //Notificar evento CONNECT PLAYER
+            //Notificar evento CONNECT_PLAYER
             //notificarObservadores(EVENT.CONNECT_PLAYER);
         }
     }
@@ -83,7 +107,7 @@ public class GameMatch implements IGameMatch{
     public void disconnectPlayer(int id) {
         IPlayer player = getPlayerByID(id);
         queueTurns.remove(player);
-        //Notificar evento DISCONNECT PLAYER
+        //Notificar evento DISCONNECT_PLAYER
         //notificarObservadores(EVENT.DISCONNECT_PLAYER);
     }
 
@@ -120,20 +144,22 @@ public class GameMatch implements IGameMatch{
         return numOfPlayers == queueTurns.size();
     }
 
-    /*Private Methods of GameMatch...*/
-
-    private void whoStart() {
+    public int whoStart() {
+        int firstTurn = 0;
         if(numOfPlayers > 0){
-            int firstTurn = (int) (Math.random() * (numOfPlayers - 1 + 1)) + 1;
+            firstTurn = (int) (Math.random() * (numOfPlayers - 1 + 1)) + 1;
             for (int i = 0; i < firstTurn - 1; i++) {
                 queueTurns.offer(queueTurns.poll());
             }
         }
+        return firstTurn;
     }
 
-    private void setStatusGame(STATUS newStatus){
+    public void setStatusGame(STATUS newStatus){
         this.statusGame = newStatus;
     }
+
+    /*Private Methods of GameMatch...*/
 
     private void setRounds(){
         if(numOfPlayers > 0){
@@ -153,5 +179,13 @@ public class GameMatch implements IGameMatch{
                 p.receiveCard(getDeck().removeTopCard());
             }
         }
+    }
+
+    private boolean validLimitPoints(int limitPoints){
+        return (limitPoints > MIN_POINTS && limitPoints < MAX_POINTS);
+    }
+
+    private boolean validNumOfPlayers(int numOfPlayers){
+        return (numOfPlayers >= MIX_PLAYERS && numOfPlayers <= MAX_PLAYERS);
     }
 }

@@ -35,47 +35,31 @@ public class GameModel implements IGameModel {
     }
 
     @Override
-    public void initGame(int limitPoints, int numOfPlayers) {
-
-    }
-
-    @Override
     public void startGame() {
         //comienza cuando todos los jugadores estan conectados
+        if(gameMatch.isAllPlayersConnect()){
+            gameMatch.whoStart();
+            gameMatch.setStatusGame(STATUS.RUNNING);
+            //event
+            //Notificar evento ALL_PLAYERS_CONNECT
+            //notificarObservadores(EVENT.ALL_PLAYERS_CONNECT);
+        }
     }
-
 
     @Override
     public void loadGame() {
-
+        //cargar partida
+        gameMatch.setStatusGame(STATUS.RUNNING);
     }
 
     @Override
     public void saveGame() {
-
-    }
-
-    @Override
-    public void checkPlay() {
-
+        //guardar partida
+        gameMatch.setStatusGame(STATUS.STOPED);
     }
 
     @Override
     public void endGame() {
-
+        //gameMatch.setStatusGame(STATUS.END);
     }
-//    @Override
-//    public void initGame(int limitPoints, int numOfPlayers) {
-//        if(getStatus().compareTo(STATUS.NOT_INIT) == 0){
-//            this.statusGame = STATUS.INITIALIZED;
-//            this.stacks.add(new CenterStack(TYPECARD.SWORD,new ValidatorSwordType()));
-//            this.stacks.add(new CenterStack(TYPECARD.GOBLET,new ValidatorGobletType()));
-//            this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN,new ValidatorGoldenCoinType()));
-//            this.limitPoints = limitPoints;
-//            this.numOfPlayers = numOfPlayers;
-//            this.whoStart();
-//            return;
-//        }
-//        return;
-//    }
 }

@@ -25,15 +25,6 @@ public class DeckTest {
     }
 
     @Test
-    public void cutDeckTest() {
-        /*IDeck deck = Deck.getInstance();
-        int middle = cards.size() / 2;
-        Card card = cards.get(0);
-        deck.cutDeck();
-        assertEquals(card,cards.get(middle));*/
-    }
-
-    @Test
     public void countCardsTest() {
         IDeck deck = Deck.getInstance();
         deck.removeTopCard();
