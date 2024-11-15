@@ -37,7 +37,7 @@ public class Log implements ILog {
     @Override
     public int signUp(String userName) {
         if(isPlayer(userName)){
-            return -1;
+            return jugadores.get(userName);
         }
         jugadores.put(userName,idGenerator++);
         return jugadores.get(userName);

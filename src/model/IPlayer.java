@@ -15,4 +15,5 @@ public interface IPlayer {
     void setTurn(Boolean turn);
     Boolean getTurn();
     boolean hasID(int id);
+    List<Card> getGraveyard();
 }

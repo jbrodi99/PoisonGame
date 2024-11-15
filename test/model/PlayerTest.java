@@ -11,7 +11,7 @@ public class PlayerTest {
 
     @Test
     public void receiveCardTest() {
-        IPlayer player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         Card card = new Card(NUMBER.TWO, TYPECARD.SWORD);
         Card otherCard = new Card(NUMBER.ONE, TYPECARD.GOBLET);
         player.receiveCard(card);
@@ -21,7 +21,7 @@ public class PlayerTest {
 
     @Test
     public void viewHandTest() {
-        IPlayer player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         Card card = new Card(NUMBER.TWO, TYPECARD.SWORD);
         Card card1 = new Card(NUMBER.TWELVE, TYPECARD.SWORD);
         Card card2 = new Card(NUMBER.ONE, TYPECARD.SWORD);
@@ -44,7 +44,7 @@ public class PlayerTest {
 
     @Test
     public void playCardTest() {
-        IPlayer player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         Card card = new Card(NUMBER.ONE, TYPECARD.GOBLET);
         player.receiveCard(card);
         assertEquals(card,player.playCard(0));
@@ -52,7 +52,7 @@ public class PlayerTest {
 
     @Test
     public void countPoisonTest() {
-        IPlayer player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         Card card1 = new Card(NUMBER.ONE, TYPECARD.SWORD);
         Card card2 = new Card(NUMBER.ONE, TYPECARD.CUP);
         Card card3 = new Card(NUMBER.ONE, TYPECARD.CUP);
@@ -63,13 +63,13 @@ public class PlayerTest {
         center.addCard(card3);
         center.addCard(card4);
         player.takeHeap(center);
-        assertTrue(player.countPoison().equals(2));
+        assertTrue(player.countPoison() == 2);
         assertFalse(player.countPoison().equals(3));
     }
 
     @Test
     public void receiveDamageTest() {
-        IPlayer player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         player.receiveDamage(10);
         assertEquals(10,player.getHealth());
         assertNotEquals(9,player.getHealth());
@@ -79,7 +79,7 @@ public class PlayerTest {
 
     @Test
     public void takeHeapTest() {
-        Player player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         Card card1 = new Card(NUMBER.ONE, TYPECARD.SWORD);
         Card card2 = new Card(NUMBER.ONE, TYPECARD.CUP);
         Card card3 = new Card(NUMBER.ONE, TYPECARD.CUP);
@@ -98,28 +98,28 @@ public class PlayerTest {
 
     @Test
     public void getIdTest() {
-        Player player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         Integer one = 1;
         assertEquals(one,player.getId());
     }
 
     @Test
     public void getUserNameTest() {
-        Player player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         assertEquals("juan",player.getUserName());
         assertNotEquals("carlos",player.getUserName());
     }
 
     @Test
     public void getHealthTest() {
-        Player player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         assert (20 == player.getHealth());
     }
 
     @Test
     public void setTurnTest() {
-        Player player = new Player(1,"juan");
-        Player player2 = new Player(2,"juancito");
+        IPlayer player = new Player(1,"juan",20);
+        Player player2 = new Player(2,"juancito",20);
         player.setTurn(true);
         assertTrue(player.getTurn());
         assertFalse(player2.getTurn());
@@ -127,20 +127,11 @@ public class PlayerTest {
 
     @Test
     public void getTurnTest() {
-        Player player = new Player(1,"juan");
+        IPlayer player = new Player(1,"juan",20);
         player.setTurn(true);
         assertEquals(true,player.getTurn());
         assertNotEquals(false, player.getTurn());
         player.setTurn(false);
         assertEquals(false,player.getTurn());
-    }
-
-    @Test
-    public void getHandTest() {
-
-    }
-
-    @Test
-    public void getGraveyardTest() {
     }
 }

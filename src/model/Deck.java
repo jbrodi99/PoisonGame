@@ -32,18 +32,7 @@ public class Deck implements IDeck{
         Collections.shuffle(getCards(),new Random(System.currentTimeMillis()));
     }
 
-    @Override
-    public void cutDeck() {
-        int middle = getCards().size() / 2;
-        int index = 0;
-
-        while(index < middle) {
-            Collections.swap(getCards(),index,index + middle);
-            index++;
-        }
-    }
-
-    private List<Card> getCards() {
+    public List<Card> getCards() {
         return cards;
     }
 
