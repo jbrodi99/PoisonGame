@@ -8,14 +8,14 @@ public class ValidatorGoldenCoinTypeTest {
 
     @Test
     public void validTypeGoldenCoinTest(){
-        IValidatorType validatorType = new ValidatorGoldenCoinType();
+        IValidator<Card> validatorType = new ValidatorGoldenCoin();
         Card sword = new Card(NUMBER.TWO, TYPECARD.SWORD);
         Card goldenCoin = new Card(NUMBER.TWO, TYPECARD.GOLDEN_COIN);
         Card cup = new Card(NUMBER.TWO, TYPECARD.CUP);
         Card goblet = new Card(NUMBER.TWO, TYPECARD.GOBLET);
-        assertFalse(validatorType.validType(goblet));
-        assertTrue(validatorType.validType(cup));
-        assertTrue(validatorType.validType(goldenCoin));
-        assertFalse(validatorType.validType(sword));
+        assertFalse(validatorType.validate(goblet));
+        assertTrue(validatorType.validate(cup));
+        assertTrue(validatorType.validate(goldenCoin));
+        assertFalse(validatorType.validate(sword));
     }
 }
