@@ -1,6 +1,9 @@
 package model;
 
+import java.rmi.RemoteException;
+
 public interface IModelRoundManager {
-    void nextTurn();
-    void nextRound();
+    void nextTurn() throws RemoteException;
+    void nextRound() throws RemoteException;
+    boolean checkRound() throws RemoteException;
 }

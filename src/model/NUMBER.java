@@ -14,7 +14,6 @@ public enum NUMBER {
     ELEVEN,
     TWELVE;
 
-
     @Override
     public String toString() {
         return "" + (this.ordinal() + 1);

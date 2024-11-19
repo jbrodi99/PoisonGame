@@ -12,32 +12,32 @@ public class PlayerTest {
     @Test
     public void receiveCardTest() {
         IPlayer player = new Player(1,"juan",20);
-        Card card = new Card(NUMBER.TWO, TYPECARD.SWORD);
-        Card otherCard = new Card(NUMBER.ONE, TYPECARD.GOBLET);
-        player.receiveCard(card);
-        assertEquals(card,player.viewHand().get(0));
-        assertNotEquals(otherCard,player.viewHand().get(0));
+        ICard ICard = new Card(NUMBER.TWO, TYPECARD.SWORD);
+        ICard otherICard = new Card(NUMBER.ONE, TYPECARD.GOBLET);
+        player.receiveCard(ICard);
+        assertEquals(ICard,player.viewHand().get(0));
+        assertNotEquals(otherICard,player.viewHand().get(0));
     }
 
     @Test
     public void viewHandTest() {
         IPlayer player = new Player(1,"juan",20);
-        Card card = new Card(NUMBER.TWO, TYPECARD.SWORD);
-        Card card1 = new Card(NUMBER.TWELVE, TYPECARD.SWORD);
-        Card card2 = new Card(NUMBER.ONE, TYPECARD.SWORD);
-        Card card3 = new Card(NUMBER.FOUR, TYPECARD.SWORD);
-        List<Card> cards = new ArrayList<>();
-        cards.add(card);
-        cards.add(card1);
-        cards.add(card2);
-        cards.add(card3);
-        player.receiveCard(card);
-        player.receiveCard(card1);
-        player.receiveCard(card2);
-        player.receiveCard(card3);
-        List<Card> playerHand = player.viewHand();
+        ICard ICard = new Card(NUMBER.TWO, TYPECARD.SWORD);
+        ICard ICard1 = new Card(NUMBER.TWELVE, TYPECARD.SWORD);
+        ICard ICard2 = new Card(NUMBER.ONE, TYPECARD.SWORD);
+        ICard ICard3 = new Card(NUMBER.FOUR, TYPECARD.SWORD);
+        List<ICard> ICards = new ArrayList<>();
+        ICards.add(ICard);
+        ICards.add(ICard1);
+        ICards.add(ICard2);
+        ICards.add(ICard3);
+        player.receiveCard(ICard);
+        player.receiveCard(ICard1);
+        player.receiveCard(ICard2);
+        player.receiveCard(ICard3);
+        List<ICard> playerHand = player.viewHand();
         int i = 0;
-        for(Card c : cards){
+        for(ICard c : ICards){
             assertEquals(c,playerHand.get(i++));
         }
     }
@@ -45,23 +45,23 @@ public class PlayerTest {
     @Test
     public void playCardTest() {
         IPlayer player = new Player(1,"juan",20);
-        Card card = new Card(NUMBER.ONE, TYPECARD.GOBLET);
-        player.receiveCard(card);
-        assertEquals(card,player.playCard(0));
+        ICard ICard = new Card(NUMBER.ONE, TYPECARD.GOBLET);
+        player.receiveCard(ICard);
+        assertEquals(ICard,player.playCard(0));
     }
 
     @Test
     public void countPoisonTest() {
         IPlayer player = new Player(1,"juan",20);
-        Card card1 = new Card(NUMBER.ONE, TYPECARD.SWORD);
-        Card card2 = new Card(NUMBER.ONE, TYPECARD.CUP);
-        Card card3 = new Card(NUMBER.ONE, TYPECARD.CUP);
-        Card card4 = new Card(NUMBER.ONE, TYPECARD.SWORD);
+        ICard ICard1 = new Card(NUMBER.ONE, TYPECARD.SWORD);
+        ICard ICard2 = new Card(NUMBER.ONE, TYPECARD.CUP);
+        ICard ICard3 = new Card(NUMBER.ONE, TYPECARD.CUP);
+        ICard ICard4 = new Card(NUMBER.ONE, TYPECARD.SWORD);
         CenterStack center = new CenterStack(TYPECARD.SWORD,new ValidatorSword());
-        center.addCard(card1);
-        center.addCard(card2);
-        center.addCard(card3);
-        center.addCard(card4);
+        center.addCard(ICard1);
+        center.addCard(ICard2);
+        center.addCard(ICard3);
+        center.addCard(ICard4);
         player.takeHeap(center);
         assertTrue(player.countPoison() == 2);
         assertFalse(player.countPoison().equals(3));
@@ -80,20 +80,20 @@ public class PlayerTest {
     @Test
     public void takeHeapTest() {
         IPlayer player = new Player(1,"juan",20);
-        Card card1 = new Card(NUMBER.ONE, TYPECARD.SWORD);
-        Card card2 = new Card(NUMBER.ONE, TYPECARD.CUP);
-        Card card3 = new Card(NUMBER.ONE, TYPECARD.CUP);
-        Card card4 = new Card(NUMBER.ONE, TYPECARD.SWORD);
+        ICard ICard1 = new Card(NUMBER.ONE, TYPECARD.SWORD);
+        ICard ICard2 = new Card(NUMBER.ONE, TYPECARD.CUP);
+        ICard ICard3 = new Card(NUMBER.ONE, TYPECARD.CUP);
+        ICard ICard4 = new Card(NUMBER.ONE, TYPECARD.SWORD);
         CenterStack center = new CenterStack(TYPECARD.SWORD,new ValidatorSword());
-        center.addCard(card1);
-        center.addCard(card2);
-        center.addCard(card3);
-        center.addCard(card4);
+        center.addCard(ICard1);
+        center.addCard(ICard2);
+        center.addCard(ICard3);
+        center.addCard(ICard4);
         player.takeHeap(center);
-        assertEquals(card4,player.getGraveyard().get(0));
-        assertEquals(card3,player.getGraveyard().get(1));
-        assertEquals(card2,player.getGraveyard().get(2));
-        assertEquals(card1,player.getGraveyard().get(3));
+        assertEquals(ICard4,player.getGraveyard().get(0));
+        assertEquals(ICard3,player.getGraveyard().get(1));
+        assertEquals(ICard2,player.getGraveyard().get(2));
+        assertEquals(ICard1,player.getGraveyard().get(3));
     }
 
     @Test

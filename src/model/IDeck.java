@@ -5,7 +5,7 @@ import java.util.List;
 public interface IDeck {
     void shuffleDeck();
     Integer countCards();
-    Card removeTopCard();
+    ICard removeTopCard();
     Boolean isEmpty();
-    List<Card> getCards();
+    List<ICard> getCards();
 }

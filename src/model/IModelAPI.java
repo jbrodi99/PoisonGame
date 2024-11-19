@@ -1,4 +1,4 @@
 package model;
 
-public interface IModelAPI extends IModelGameManagement, IModelPlayerManager, IModelRoundManager {
+public interface IModelAPI extends IGameManagement, IPlayerManager, IModelRoundManager {
 }

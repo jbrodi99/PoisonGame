@@ -15,8 +15,6 @@ public class PlayerManager implements IPlayerManager{
     public void connectPlayer(String userName, int id, int health) {
         if(gameMatch.getQueueTurns().size() < gameMatch.getNumOfPLayers()){
             gameMatch.getQueueTurns().offer(new Player(id,userName, health));
-            //Notificar evento CONNECT_PLAYER
-            //notificarObservadores(EVENT.CONNECT_PLAYER);
         }
     }
 
@@ -24,8 +22,6 @@ public class PlayerManager implements IPlayerManager{
     public void disconnectPlayer(int id) {
         IPlayer player = getPlayerByID(id);
         gameMatch.getQueueTurns().remove(player);
-        //Notificar evento DISCONNECT_PLAYER
-        //notificarObservadores(EVENT.DISCONNECT_PLAYER);
     }
 
     @Override

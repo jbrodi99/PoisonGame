@@ -1,5 +1,6 @@
 package model;
 
+import java.util.List;
 import java.util.Queue;
 
 public class RoundManager implements IRoundManager{
@@ -18,9 +19,6 @@ public class RoundManager implements IRoundManager{
     public void nextTurn() {
         gameMatch.getQueueTurns().offer(gameMatch.getQueueTurns().poll());
         turnsPlayed++;
-        //notificar Ronda jugada
-        //notificarObservadores(EVENT.NEXT_TURN);
-        /*Terminar de definir que acciones realizar desde el juego cuando se juega un turno*/
     }
 
     @Override
@@ -29,14 +27,15 @@ public class RoundManager implements IRoundManager{
             turnsPlayed = 0;
             rounds--;
             dealHand();
-            //notificar siguiente Ronda
-            //notificarObservadores(EVENT.NEXT_ROUND);
+            return;
         }
+        if()
+
         //repetir hasta que solo quede un ganador...
     }
 
     @Override
-    public int whoStart() {
+    public void whoStart() {
         int firstTurn = 0;
         if(gameMatch.getNumOfPLayers() > 0){
             firstTurn = (int) (Math.random() * (gameMatch.getNumOfPLayers() - 1 + 1)) + 1;
@@ -44,7 +43,6 @@ public class RoundManager implements IRoundManager{
                 gameMatch.getQueueTurns().offer(gameMatch.getQueueTurns().poll());
             }
         }
-        return firstTurn;
     }
 
     @Override
@@ -62,12 +60,21 @@ public class RoundManager implements IRoundManager{
         this.movesPerRound = MOVES_PER_TURN * gameMatch.getNumOfPLayers();
     }
 
-    @Override
-    public void dealHand() {
+
+    private void dealHand() {
         Queue<IPlayer> queueTurns = gameMatch.getQueueTurns();
         for (int i = 0; i < gameMatch.getNumOfPLayers(); i++) {
             for (IPlayer p : queueTurns){
                 p.receiveCard(gameMatch.getDeck().removeTopCard());
+            }
+        }
+    }
+
+    private void retrieveCards(){
+        Queue<IPlayer> queueTurns = gameMatch.getQueueTurns();
+        for(IPlayer p : queueTurns){
+            while(!p.getGraveyard().isEmpty()){
+                gameMatch.getDeck().getCards().add(p.getGraveyard().remove(0));
             }
         }
     }

@@ -8,7 +8,7 @@ import java.util.Random;
 public class Deck implements IDeck{
 
     private static IDeck instance = null;
-    private List<Card> cards = new ArrayList<>();
+    private List<ICard> cards = new ArrayList<>();
 
     public static IDeck getInstance(){
         if(instance == null){
@@ -32,7 +32,7 @@ public class Deck implements IDeck{
         Collections.shuffle(getCards(),new Random(System.currentTimeMillis()));
     }
 
-    public List<Card> getCards() {
+    public List<ICard> getCards() {
         return cards;
     }
 
@@ -42,7 +42,7 @@ public class Deck implements IDeck{
     }
 
     @Override
-    public Card removeTopCard() {
+    public ICard removeTopCard() {
         return getCards().remove(0);
     }
 

@@ -4,18 +4,19 @@ import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import model.EVENT;
 import model.IGameModel;
-import view.IView;
+import view.IGameView;
 
 import java.rmi.RemoteException;
 
 public class GameController implements IControladorRemoto {
-    IView view;
-    IGameModel model;
+    private IGameView view;
+    private IGameModel model;
+    private int playerID;
 
     public GameController(){
     }
 
-    public void setView(IView view) {
+    public void setView(IGameView view) {
         this.view = view;
     }
 
@@ -31,5 +32,16 @@ public class GameController implements IControladorRemoto {
 
     }
 
+    public int getPlayerID() {
+        return playerID;
+    }
+
+    public void disconnectPlayer() {
+        try {
+            model.close(this, getPlayerID());
+        }catch (RemoteException e){
+            view.displayMessage("mistake has occurred.");
+        }
+    }
 
 }

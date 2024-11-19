@@ -1,5 +1,6 @@
 package model;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,42 +86,82 @@ public class GameMatch implements IGameMatch{
     }
 
     @Override
-    public void startGame() {
+    public void startGame() throws RemoteException {
         gameManagement.startGame();
     }
 
     @Override
-    public void endGame() {
+    public void endGame() throws RemoteException {
         gameManagement.endGame();
     }
 
     @Override
-    public void initGame(int limitPoints, int numOfPlayers) {
+    public void initGame(int limitPoints, int numOfPlayers) throws RemoteException {
         gameManagement.initGame(limitPoints,numOfPlayers);
     }
 
     @Override
-    public void connectPlayer(String userName, int id, int health) {
+    public int getConnectedPlayers() throws RemoteException {
+        return gameManagement.getConnectedPlayers();
+    }
+
+    @Override
+    public IPlayer getCurrentPlayer() throws RemoteException {
+        return gameManagement.getCurrentPlayer();
+    }
+
+    @Override
+    public void connectPlayer(String userName, int id, int health) throws RemoteException {
         playerManager.connectPlayer(userName,id,health);
     }
 
     @Override
-    public void disconnectPlayer(int id) {
+    public void disconnectPlayer(int id) throws RemoteException {
         playerManager.disconnectPlayer(id);
     }
 
     @Override
-    public boolean isAllPlayersConnect() {
+    public boolean isAllPlayersConnect() throws RemoteException {
         return playerManager.isAllPlayersConnect();
     }
 
     @Override
-    public void nextTurn() {
+    public IPlayer getPlayerByID(int id) throws RemoteException {
+        return playerManager.getPlayerByID(id);
+    }
+
+    @Override
+    public List<IPlayer> getAllPlayers() throws RemoteException {
+        return playerManager.getAllPlayers();
+    }
+
+    @Override
+    public void nextTurn() throws RemoteException {
         roundManager.nextTurn();
     }
 
     @Override
-    public void nextRound() {
+    public void nextRound() throws RemoteException {
         roundManager.nextRound();
+    }
+
+    @Override
+    public void whoStart() {
+        roundManager.whoStart();
+    }
+
+    @Override
+    public boolean checkRound() throws RemoteException {
+        return roundManager.checkRound();
+    }
+
+    @Override
+    public void setRounds() {
+        roundManager.setRounds();
+    }
+
+    @Override
+    public void setMovesPerRound() {
+        roundManager.setMovesPerRound();
     }
 }

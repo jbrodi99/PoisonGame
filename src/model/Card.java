@@ -7,7 +7,7 @@ package model;
  * @author Rodriguez Juan Cruz
  * @version 1.0
  */
-public class Card {
+public class Card implements ICard {
     private NUMBER number;
     private TYPECARD typeCard;
 
@@ -16,18 +16,22 @@ public class Card {
         this.typeCard = typeCard;
     }
 
+    @Override
     public NUMBER getValue() {
         return number;
     }
 
+    @Override
     public TYPECARD getTypeCard() {
         return typeCard;
     }
 
+    @Override
     public Boolean isType(TYPECARD oType){
         return getTypeCard().compareTo(oType) == 0;
     }
 
+    @Override
     public Boolean isMayorTen(){
         return  number.compareTo(NUMBER.TEN) >= 0;
     }
