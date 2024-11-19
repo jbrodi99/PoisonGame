@@ -2,8 +2,6 @@ package model;
 
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.junit.Assert.*;
 
 public class DeckTest {
@@ -18,10 +16,10 @@ public class DeckTest {
     @Test
     public void shuffleDeckTest() {
         IDeck deck = Deck.getInstance();
-        Card card1 = deck.removeTopCard();
+        ICard ICard1 = deck.removeTopCard();
         deck.shuffleDeck();
-        Card card2 = deck.removeTopCard();
-        assertNotEquals(card1,card2);
+        ICard ICard2 = deck.removeTopCard();
+        assertNotEquals(ICard1, ICard2);
     }
 
     @Test
@@ -34,9 +32,9 @@ public class DeckTest {
     @Test
     public void removeTopCardTest() {
         IDeck deck = Deck.getInstance();
-        Card card = deck.removeTopCard();
-        Card otherCard = deck.removeTopCard();
-        assertFalse(card.equals(otherCard));
+        ICard ICard = deck.removeTopCard();
+        ICard otherICard = deck.removeTopCard();
+        assertFalse(ICard.equals(otherICard));
     }
 
     @Test

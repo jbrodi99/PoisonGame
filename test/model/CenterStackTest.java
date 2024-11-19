@@ -39,31 +39,31 @@ public class CenterStackTest {
     @Test
     public void addCardTest() {
         CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
-        Card card = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
-        center.addCard(card);
-        assertEquals(card,center.removeTopCard());
+        ICard ICard = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
+        center.addCard(ICard);
+        assertEquals(ICard,center.removeTopCard());
     }
 
     @Test
     public void isEmptyTest() {
         CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
         assertTrue(center.isEmpty());
-        Card card = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
-        center.addCard(card);
+        ICard ICard = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
+        center.addCard(ICard);
         assertFalse(center.isEmpty());
     }
 
     @Test
     public void removeTopCardTest() {
         CenterStack center = new CenterStack(TYPECARD.SWORD, new ValidatorSword());
-        Card card0 = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
-        center.addCard(card0);
-        Card card1 = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
-        center.addCard(card1);
-        Card card2 = center.removeTopCard();
-        Card card3 = center.removeTopCard();
-        assertEquals(card0,card3);
-        assertEquals(card1,card2);
+        ICard ICard0 = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
+        center.addCard(ICard0);
+        ICard ICard1 = new Card(NUMBER.ELEVEN,TYPECARD.SWORD);
+        center.addCard(ICard1);
+        ICard ICard2 = center.removeTopCard();
+        ICard ICard3 = center.removeTopCard();
+        assertEquals(ICard0, ICard3);
+        assertEquals(ICard1, ICard2);
 
     }
 }

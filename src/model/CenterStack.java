@@ -6,7 +6,7 @@ public class CenterStack implements ICenterStack {
 
     private final double MAX_CARDS_VALUE = 13.0;
     private IValidator validatorType;
-    private Stack<Card> cards = new Stack<>();
+    private Stack<ICard> cards = new Stack<>();
     private TYPECARD typecard;
 
     public CenterStack(TYPECARD typecard, IValidator validatorType){
@@ -23,7 +23,7 @@ public class CenterStack implements ICenterStack {
         if(getCards().isEmpty()){
             return false;
         }
-        for(Card c : getCards()){
+        for(ICard c : getCards()){
             if(c.isMayorTen()){
                 count += 0.5;
             }else{
@@ -33,7 +33,7 @@ public class CenterStack implements ICenterStack {
         return count >= MAX_CARDS_VALUE;
     }
 
-    public Stack<Card> getCards(){
+    public Stack<ICard> getCards(){
         return cards;
     }
 
@@ -41,7 +41,7 @@ public class CenterStack implements ICenterStack {
         return getCards().size();
     }
 
-    public void addCard(Card card){
+    public void addCard(ICard card){
         getCards().add(card);
     }
 
@@ -49,7 +49,7 @@ public class CenterStack implements ICenterStack {
         return getCards().size() == 0;
     }
 
-    public Card removeTopCard() {
+    public ICard removeTopCard() {
         return getCards().pop();
     }
 

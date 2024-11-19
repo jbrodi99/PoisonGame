@@ -3,9 +3,9 @@ package model;
 import java.util.List;
 
 public interface IPlayer {
-    void receiveCard(Card card);
-    List<Card> viewHand();
-    Card playCard(int index);
+    void receiveCard(ICard ICard);
+    List<ICard> viewHand();
+    ICard playCard(int index);
     Integer countPoison();
     void receiveDamage(Integer poison);
     void takeHeap(CenterStack centerStack);
@@ -15,5 +15,5 @@ public interface IPlayer {
     void setTurn(Boolean turn);
     Boolean getTurn();
     boolean hasID(int id);
-    List<Card> getGraveyard();
+    List<ICard> getGraveyard();
 }

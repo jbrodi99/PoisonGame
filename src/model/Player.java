@@ -9,8 +9,8 @@ public class Player implements IPlayer{
     private String userName;
     private int health;
     private Boolean turn;
-    private List<Card> hand = new ArrayList<>();
-    private List<Card> graveyard = new ArrayList<>();
+    private List<ICard> hand = new ArrayList<>();
+    private List<ICard> graveyard = new ArrayList<>();
 
     public Player(Integer id, String userName, int health){
         this.id = id;
@@ -20,24 +20,24 @@ public class Player implements IPlayer{
     }
 
     @Override
-    public void receiveCard(Card card) {
+    public void receiveCard(ICard card) {
         hand.add(card);
     }
 
     @Override
-    public List<Card> viewHand() {
+    public List<ICard> viewHand() {
         return new ArrayList<>(getHand());
     }
 
     @Override
-    public Card playCard(int index) {
+    public ICard playCard(int index) {
         return getHand().remove(index);
     }
 
     @Override
     public Integer countPoison() {
         Integer poison = 0;
-        for (Card c : getGraveyard()){
+        for (ICard c : getGraveyard()){
             if(c.isType(TYPECARD.CUP)){
                 poison++;
             }
@@ -60,7 +60,7 @@ public class Player implements IPlayer{
 
     @Override
     public void takeHeap(CenterStack centerStack) {
-        List<Card> gr = getGraveyard();
+        List<ICard> gr = getGraveyard();
         while(!centerStack.isEmpty()){
             gr.add(centerStack.removeTopCard());
         }
@@ -98,12 +98,12 @@ public class Player implements IPlayer{
         return (getId().compareTo(id) == 0);
     }
 
-    public List<Card> getHand() {
+    public List<ICard> getHand() {
         return hand;
     }
 
     @Override
-    public List<Card> getGraveyard() {
+    public List<ICard> getGraveyard() {
         return graveyard;
     }
 }

@@ -5,10 +5,10 @@ import java.util.Stack;
 public interface ICenterStack {
     public void setValidator(IValidator validatorType);
     public Boolean isOverflowing();
-    public Stack<Card> getCards();
+    public Stack<ICard> getCards();
     public Integer countCards();
-    public void addCard(Card card);
+    public void addCard(ICard ICard);
     public Boolean isEmpty();
-    public Card removeTopCard();
+    public ICard removeTopCard();
     public TYPECARD getTypecard();
 }

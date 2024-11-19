@@ -1,9 +1,7 @@
 package model;
 
 public interface IRoundManager extends IModelRoundManager {
-    void dealHand();
-    int whoStart();
-    boolean checkRound();
+    void whoStart();
     void setRounds();
     void setMovesPerRound();
 }

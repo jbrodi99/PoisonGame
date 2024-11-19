@@ -2,7 +2,7 @@ package model;
 
 import java.util.Queue;
 
-public interface IGameMatch extends IModelGameManagement,IModelPlayerManager, IModelRoundManager{
+public interface IGameMatch extends IGameManagement,IPlayerManager, IRoundManager{
     IDeck getDeck();
     void setDeck(IDeck deck);
     ICenterStack getCenter(TYPECARD type);

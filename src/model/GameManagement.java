@@ -1,5 +1,8 @@
 package model;
 
+import java.rmi.RemoteException;
+import java.util.Queue;
+
 public class GameManagement implements IGameManagement{
 
     private final IGameMatch gameMatch;
@@ -14,7 +17,7 @@ public class GameManagement implements IGameManagement{
 
     @Override
     public void startGame() {
-
+        //gameMatch.whoStart();
     }
 
     @Override
@@ -30,6 +33,8 @@ public class GameManagement implements IGameManagement{
             gameMatch.setNumOfPlayers(numOfPlayers);
             gameMatch.setLimitPoints(limitPoints);
             gameMatch.setDeck(Deck.getInstance());
+            gameMatch.setMovesPerRound();
+            gameMatch.setRounds();
             gameMatch.setStatusGame(STATUS.INITIALIZED);
         }
     }
@@ -40,7 +45,19 @@ public class GameManagement implements IGameManagement{
     }
 
     @Override
+    public int getPlayersAlive() throws RemoteException {
+        int alive = 0;
+        Queue<IPlayer> queueTurns = gameMatch.getQueueTurns();
+        for(IPlayer p : gameMatch.getQueueTurns()){
+            if(p.getHealth() > 0)   alive++;
+        }
+        return alive;
+    }
+
+    @Override
     public IPlayer getCurrentPlayer() {
         return gameMatch.getQueueTurns().peek();
     }
+
+
 }

@@ -1,6 +1,13 @@
 package model;
 
-public class GameModel implements IGameModel {
+import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
+import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
+import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
+
+import java.rmi.RemoteException;
+import java.util.List;
+
+public class GameModel extends ObservableRemoto implements IGameModel {
 
     private static IGameModel instance = null;
     private ILog log;
@@ -14,66 +21,97 @@ public class GameModel implements IGameModel {
         gameMatch = GameMatch.getInstance();
     }
 
-    public static IGameModel getInstance(){
+    public static IGameModel getInstance() throws RemoteException {
         if(instance == null)   instance = new GameModel();
         return instance;
     }
 
     @Override
-    public ILog getLog() {
+    public ILog getLog() throws RemoteException {
         return log;
     }
 
     @Override
-    public IRanking getRanking() {
+    public IRanking getRanking() throws RemoteException {
         return ranking;
     }
 
     @Override
-    public IGameMatch getGameMatch() {
+    public IGameMatch getGameMatch() throws RemoteException {
         return gameMatch;
+    }
+
+    @Override
+    public void close(IObservadorRemoto obs, int playerID) throws RemoteException {
+        this.removerObservador(obs);
+        this.disconnectPlayer(playerID);
     }
 
 
     @Override
-    public void startGame() {
+    public void startGame() throws RemoteException {
         getGameMatch().startGame();
     }
 
     @Override
-    public void endGame() {
+    public void endGame() throws RemoteException {
         getGameMatch().endGame();
     }
 
     @Override
-    public void initGame(int limitPoints, int numOfPlayers) {
+    public void initGame(int limitPoints, int numOfPlayers) throws RemoteException {
         getGameMatch().initGame(limitPoints,numOfPlayers);
     }
 
     @Override
-    public void connectPlayer(String userName, int id, int health) {
+    public int getConnectedPlayers() throws RemoteException {
+        return getGameMatch().getConnectedPlayers();
+    }
+
+    @Override
+    public IPlayer getCurrentPlayer() throws RemoteException {
+        return null;
+    }
+    
+    @Override
+    public void connectPlayer(String userName, int id, int health) throws RemoteException {
         getGameMatch().connectPlayer(userName,id,health);
     }
 
     @Override
-    public void disconnectPlayer(int id) {
+    public void disconnectPlayer(int id) throws RemoteException {
         getGameMatch().disconnectPlayer(id);
     }
 
     @Override
-    public boolean isAllPlayersConnect() {
+    public boolean isAllPlayersConnect() throws RemoteException {
         return getGameMatch().isAllPlayersConnect();
     }
 
     @Override
-    public void nextTurn() {
-        getGameMatch().nextTurn();
+    public IPlayer getPlayerByID(int id) throws RemoteException {
+        return getGameMatch().getPlayerByID(id);
     }
 
     @Override
-    public void nextRound() {
-        getGameMatch().nextRound();
+    public List<IPlayer> getAllPlayers() throws RemoteException {
+        return getGameMatch().getAllPlayers();
     }
 
+    @Override
+    public void nextTurn() throws RemoteException {
+        getGameMatch().nextTurn();
+        //notificar evento
+    }
 
+    @Override
+    public void nextRound() throws RemoteException {
+        getGameMatch().nextRound();
+        //notificar ronda
+    }
+
+    @Override
+    public boolean checkRound() throws RemoteException {
+        return getGameMatch().checkRound();
+    }
 }

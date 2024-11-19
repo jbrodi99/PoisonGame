@@ -2,6 +2,8 @@ package server;
 
 import ar.edu.unlu.rmimvc.RMIMVCException;
 import ar.edu.unlu.rmimvc.servidor.Servidor;
+import model.GameModel;
+import model.IGameModel;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
@@ -30,15 +32,16 @@ public class AppServer {
         String nombre =  JOptionPane.showInputDialog(null, "Ingrese el nombre de la partida a recuperar (deje vacio para una nueva)", "Nombre usuario", JOptionPane.QUESTION_MESSAGE);
 
         //IDomino juego = AdministradorPartidas.getPartidaJugador(nombre);
+        IGameModel gameModel = null; //recuperar partida persistida
         Servidor servidor = new Servidor(AppServer.IP, AppServer.PORT);
-        if (juego == null) {
-            juego = Domino.getInstancia();
+        if (gameModel == null) {
+            gameModel = GameModel.getInstance();
             SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "No se encontro partida guardada, comenzara una nueva.", "Nueva partida", JOptionPane.INFORMATION_MESSAGE));
         } else
             SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "Se encontro una partida guardada, se retomara desde ese punto", "Cargar partida", JOptionPane.INFORMATION_MESSAGE));
 
         try {
-            servidor.iniciar(juego);
+            servidor.iniciar(gameModel);
         } catch (RemoteException e) {
             SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "Ha ocurrido un error de red !!!",
                     "Error Red", JOptionPane.ERROR_MESSAGE));
