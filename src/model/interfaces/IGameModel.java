@@ -6,7 +6,6 @@ import model.exceptions.*;
 
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
 
 public interface IGameModel extends IObservableRemoto {
     ILog getLog() throws RemoteException;
@@ -16,11 +15,15 @@ public interface IGameModel extends IObservableRemoto {
     void playTurn(int indexCard,int indexCenter) throws RemoteException, InvalidTypeCardException, LostCardException, CardIndexOutOfBoundsException;
     void initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException;
     void startGame() throws RemoteException, LostCardException;
-    void connectPLayer(String userName,int id) throws RemoteException, LostCardException;
+    void connectPLayer(String userName, int id) throws RemoteException, LostCardException;
     IPlayer getCurrentPlayer() throws RemoteException;
     void loadGame() throws RemoteException;
     void saveGame() throws RemoteException;
     List<ICenterStack> getAllCenters() throws RemoteException;
     List<IPlayer> getAllPlayers() throws RemoteException;
     IPlayer getPlayerByID(int id) throws RemoteException;
+    boolean isExists() throws RemoteException;
+    int signIn(String userName) throws RemoteException, NonExistsPlayerException;
+    void signUp(String userName) throws PlayerAlreadyExistsException, RemoteException;
+    boolean isPlayerConnect(int id) throws RemoteException;
 }

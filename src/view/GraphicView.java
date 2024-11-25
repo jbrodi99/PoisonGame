@@ -12,11 +12,9 @@ import java.util.Map;
 public class GraphicView extends JFrame implements IGameView {
 
     private GameController controller;
-    private String userName;
 
-    public GraphicView(String userName,GameController controller) {
+    public GraphicView(GameController controller) {
         this.controller = controller;
-        this.userName = userName;
         setTitle("Poison Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(1200,650,400,400);
@@ -36,6 +34,11 @@ public class GraphicView extends JFrame implements IGameView {
     }
 
     @Override
+    public JPanel getPanel() {
+        return null;
+    }
+
+    @Override
     public void displayActions() {
 
     }
@@ -44,11 +47,6 @@ public class GraphicView extends JFrame implements IGameView {
     public void hiddenActions() {
 
     }
-
-//    @Override
-//    public void displayCard(int number, String type) {
-//
-//    }
 
     @Override
     public void displayHand(List<ICard> cards) {
@@ -62,6 +60,11 @@ public class GraphicView extends JFrame implements IGameView {
 
     @Override
     public void displayBoard(List<ICenterStack> cards, List<IPlayer> players) {
+
+    }
+
+    @Override
+    public void waitPlayer(int players) {
 
     }
 

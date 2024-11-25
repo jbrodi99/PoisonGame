@@ -3,12 +3,10 @@ package model.logic;
 
 import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
-import com.sun.jdi.event.ExceptionEvent;
 import model.enums.EVENT;
 import model.enums.TYPECARD;
 import model.exceptions.*;
 import model.interfaces.*;
-
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
@@ -24,6 +22,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     private IPlayerManager playerManager;
     private IRoundManager roundManager;
     private IGamePersistence gamePersistence;
+    private boolean exists = false;
 
     private GameModel(){
         //instanciar log, ranking y partida, pero creo que se deberían recuperar con objetos serializados, chequear...
@@ -54,6 +53,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     public IGameMatch getGameMatch() throws RemoteException {
         return gameMatch;
     }
+
 
     @Override
     public void close(IObservadorRemoto obs, int playerID) throws RemoteException {
@@ -95,6 +95,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     @Override
     public void initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException {
         getGameMatch().initGame(limitPoints,numOfPlayers);
+        exists = true;
     }
 
     @Override
@@ -105,12 +106,35 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     }
 
     @Override
+    public int signIn(String userName) throws RemoteException, NonExistsPlayerException {
+        return log.signIn(userName);
+    }
+
+    @Override
+    public void signUp(String userName) throws RemoteException, PlayerAlreadyExistsException {
+        log.signUp(userName);
+    }
+
+    @Override
     public void connectPLayer(String userName, int id) throws RemoteException, LostCardException {
-        playerManager.connectPlayer(getGameMatch(),userName,id);
+        playerManager.connectPlayer(getGameMatch(),userName, id);
+        notificarObservadores(EVENT.CONNECT_PLAYER);
         if(playerManager.isAllPlayersConnect(getGameMatch())){
             startGame();
             notificarObservadores(EVENT.ALL_PLAYERS_CONNECT);
         }
+    }
+
+    @Override
+    public boolean isPlayerConnect(int id) throws RemoteException {
+        boolean isConnect = false;
+        List<IPlayer> players = gameMatch.getPlayers();
+        for (IPlayer p : players){
+            if(p.areYou(id)){
+                isConnect = true;
+            }
+        }
+        return isConnect;
     }
 
     @Override
@@ -143,5 +167,10 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     @Override
     public IPlayer getPlayerByID(int id) throws RemoteException {
         return playerManager.getPlayerByID(getGameMatch(),id);
+    }
+
+    @Override
+    public boolean isExists() throws RemoteException{
+        return exists;
     }
 }

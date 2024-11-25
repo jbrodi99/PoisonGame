@@ -1,7 +1,6 @@
 package model.logic;
 
 import model.enums.NUMBER;
-import model.enums.STATUS;
 import model.enums.TYPECARD;
 import model.exceptions.InvalidLimitPointsException;
 import model.exceptions.InvalidNumOfPlayerException;
@@ -43,9 +42,9 @@ public class GameMatch implements IGameMatch, Serializable {
         this.stacks = new ArrayList<>();
         this.playersConnected = new ArrayList<>();
         this.queueTurns = new LinkedList<>();
-        this.stacks.add(new CenterStack(TYPECARD.SWORD,new ValidatorSword()));
-        this.stacks.add(new CenterStack(TYPECARD.GOBLET,new ValidatorGoblet()));
-        this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN,new ValidatorGoldenCoin()));
+        this.stacks.add(new CenterStack(TYPECARD.SWORD));
+        this.stacks.add(new CenterStack(TYPECARD.GOBLET));
+        this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN));
         this.validatorPoints = new ValidatorLimitPoints();
         this.validatorPlayerCapacity = new ValidatorPlayerCapacity();
     }

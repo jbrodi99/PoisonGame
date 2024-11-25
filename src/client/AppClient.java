@@ -49,9 +49,9 @@ public class AppClient {
 //                8888
 //        );
         GameController controller = new GameController();
-        //IView view = new InitView(controller);
-        IGameView view = new ConsoleView("juan",controller);
-        controller.setView(view);
+        IView view = new InitView(controller);
+        //IGameView view = new ConsoleView(controller);
+        //controller.setView(view);
         Cliente c = null;
         try {
             c = new Cliente(AppClient.IP, Integer.parseInt(port), AppClient.IP, AppClient.PORT);

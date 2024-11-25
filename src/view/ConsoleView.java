@@ -13,13 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConsoleView extends JFrame implements IGameView {
+public class ConsoleView  implements IGameView {
 
     private final GameController controller;
+    private JFrame frame;
+    private JPanel consolePanel;
     private JTextArea txtOutput;
     private JTextField txtInput;
     private JButton btnEnter;
-    private final String name;
     public static boolean playing = false;
     private static final Map<String, Integer> SUIT_MAP = new HashMap<>();
 
@@ -29,73 +30,61 @@ public class ConsoleView extends JFrame implements IGameView {
         SUIT_MAP.put("coin", 3);
     }
 
-    public ConsoleView(String name, GameController controller) {
-        this.controller = controller;
-        this.name = name;
-        setTitle("Veneno Consola");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setResizable(false);
+    public ConsoleView(GameController controller, JFrame frame) {
+            this.controller = controller;
+            this.frame = frame;
+            this.consolePanel = new JPanel(); // Panel principal.
+            initComponents();
+        }
 
-        initComponents();
+        private void initComponents() {
+            consolePanel.setLayout(new BorderLayout());
+
+            // Configuración del área de salida.
+            txtOutput = new JTextArea();
+            txtOutput.setEditable(false);
+            txtOutput.setFont(new Font("Monospaced", Font.PLAIN, 16));
+
+            // Configuración del campo de entrada y botón.
+            txtInput = new JTextField();
+            btnEnter = new JButton("Enter");
+
+            JPanel inputPanel = new JPanel(new BorderLayout());
+            inputPanel.add(txtInput, BorderLayout.CENTER);
+            inputPanel.add(btnEnter, BorderLayout.EAST);
+
+            // Agregar componentes al panel principal.
+            consolePanel.add(new JScrollPane(txtOutput), BorderLayout.CENTER);
+            consolePanel.add(inputPanel, BorderLayout.SOUTH);
+
+            // Configuración de eventos.
+            btnEnter.addActionListener(e -> processCommand());
+            txtInput.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        processCommand();
+                    }
+                }
+            });
+
+            // Si necesitas manejar el cierre de la ventana.
+            frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    controller.disconnectPlayer();
+                    System.exit(0);
+                }
+            });
     }
 
-    private void initComponents() {
-
-        txtOutput = new JTextArea();
-        txtOutput.setEditable(false);
-        Font font = new Font("Monospaced",Font.PLAIN,16);
-        txtOutput.setFont(font);
-
-        txtInput = new JTextField();
-        btnEnter = new JButton("Enter");
-
-        JPanel inputPanel = new JPanel(new BorderLayout());
-        inputPanel.add(txtInput,BorderLayout.CENTER);
-        inputPanel.add(btnEnter,BorderLayout.EAST);
-
-        setLayout(new BorderLayout());
-        add(new JScrollPane(txtOutput),BorderLayout.CENTER);
-        add(inputPanel,BorderLayout.SOUTH);
-
-        btnEnter.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                commandHandler(txtInput.getText());
-                txtInput.setText("");
-            }
-        });
-
-        btnEnter.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    commandHandler(txtInput.getText());
-                    txtInput.setText("");
-                }
-            }
-        });
-
-        txtInput.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    commandHandler(txtInput.getText());
-                    txtInput.setText("");
-                }
-            }
-        });
-
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                controller.disconnectPlayer();
-                System.exit(0);
-            }
-        });
+    private void processCommand() {
+        String command = txtInput.getText();
+        if (!command.isEmpty()) {
+            commandHandler(command);
+            txtInput.setText("");
+        }
     }
-
     private void displaySeparator() {
         // Obtener el ancho de la ventana
         FontMetrics metrics = txtOutput.getFontMetrics(txtOutput.getFont());
@@ -123,11 +112,11 @@ public class ConsoleView extends JFrame implements IGameView {
     private void commandHandler(String command){
         command = command.toLowerCase();
         //ejecutar comando correspondiente...
-        if (command.equals("jugar")){
+        if (command.equals("play")){
             play(5,2);
-        } else if (command.startsWith("carta:")) {
+        } else if (command.startsWith("card:")) {
             playCard(command);
-        }   else if (command.startsWith("jugador:")) {
+        }   else if (command.startsWith("player:")) {
             setPlayer(command);
         } else if (command.equals("listo")) {
             controller.startGame();
@@ -144,7 +133,12 @@ public class ConsoleView extends JFrame implements IGameView {
 
     @Override
     public void init() {
-        setVisible(true);
+        frame.setVisible(true);
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return consolePanel;
     }
 
     @Override
@@ -159,23 +153,6 @@ public class ConsoleView extends JFrame implements IGameView {
         txtInput.setEditable(false);
         txtInput.setText("");
     }
-
-//    @Override
-//    public void displayCard(int number, String type) {
-//        // Ancho fijo de la carta (sin contar los bordes)
-//        int cardWidth = 10;
-//
-//        // Construir la carta
-//        StringBuilder card = new StringBuilder();
-//        card.append("+------------+\n");
-//        card.append("| " + centerText(number + " " + type, cardWidth) + " |\n");
-//        card.append("| " + " ".repeat(cardWidth) + " |\n"); // Espacio vacío
-//        card.append("| " + centerText(type + " " + number, cardWidth) + " |\n");
-//        card.append("+------------+\n");
-//
-//        // Mostrar la carta en el área de texto
-//        println(card.toString());
-//    }
 
     /**
      * Centra un texto dentro de un espacio con ancho fijo.
@@ -322,9 +299,45 @@ public class ConsoleView extends JFrame implements IGameView {
     }
 
     @Override
+    public void waitPlayer(int players) {
+        if (players <= 0) {
+            println("No hay jugadores esperando.");
+            return;
+        }
+        StringBuilder stickmen = new StringBuilder();
+
+        // Dibujar la cantidad de stickmans solicitados
+        for (int i = 0; i < players; i++) {
+            stickmen.append("      O      ");  // Cabeza
+        }
+        stickmen.append("\n");
+
+        for (int i = 0; i < players; i++) {
+            stickmen.append("     /|\\     "); // Brazos y torso
+        }
+        stickmen.append("\n");
+
+        for (int i = 0; i < players; i++) {
+            stickmen.append("     / \\     "); // Piernas
+        }
+        stickmen.append("\n");
+
+        for (int i = 0; i < players; i++) {
+            stickmen.append("Jugador ").append(i + 1).append("  "); // Etiquetas de jugadores
+        }
+        stickmen.append("\n");
+
+        stickmen.append("\nEsperando a que ").append(players).append(" jugador(es) estén listos...\n");
+
+        // Mostrar los stickmans en el área de texto
+        println(stickmen.toString());
+    }
+
+
+    @Override
     public void disconnect() {
         println("Un jugador se ah desconectado, se guardara la partida para jugar luego.");
-        SwingUtilities.invokeLater(this::dispose);
+        SwingUtilities.invokeLater(() -> frame.dispose());
         SwingUtilities.invokeLater(() -> System.exit(0));
     }
 
@@ -368,7 +381,7 @@ public class ConsoleView extends JFrame implements IGameView {
             try{
                 int id = Integer.parseInt(partes[1]);
                 controller.setPlayerID(id);
-                controller.connectPlayer(partes[2],id);
+               // controller.connectPlayer(partes[2],id);
             } catch (Exception e){
                 e.printStackTrace();
             }

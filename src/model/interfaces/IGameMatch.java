@@ -1,7 +1,7 @@
 package model.interfaces;
 
-import model.enums.STATUS;
-import model.enums.TYPECARD;
+
+
 import model.exceptions.InvalidLimitPointsException;
 import model.exceptions.InvalidNumOfPlayerException;
 import model.exceptions.LostCardException;

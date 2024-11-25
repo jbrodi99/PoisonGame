@@ -14,13 +14,11 @@ import java.util.Stack;
 public class CenterStack implements ICenterStack, Serializable {
 
     private final int MAX_CARDS_VALUE = 130;
-    private final IValidator<ICard> validatorType;
     private final Stack<ICard> cards = new Stack<>();
     private final TYPECARD typecard;
 
-    public CenterStack(TYPECARD typecard, IValidator<ICard> validatorType){
+    public CenterStack(TYPECARD typecard){
         this.typecard = typecard;
-        this.validatorType = validatorType;
     }
 
     public Boolean isOverflowing(){
@@ -32,9 +30,7 @@ public class CenterStack implements ICenterStack, Serializable {
     }
 
     public void addCard(ICard card) {
-        if(validatorType.validate(card)){
-            getCards().add(card);
-        }
+        getCards().add(card);
     }
 
     @Override
