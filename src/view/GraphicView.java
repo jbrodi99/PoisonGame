@@ -1,10 +1,13 @@
 package view;
 
 import controller.GameController;
-import model.ICard;
-import model.IPlayer;
+import model.interfaces.ICard;
+import model.interfaces.ICenterStack;
+import model.interfaces.IPlayer;
 
 import javax.swing.*;
+import java.util.List;
+import java.util.Map;
 
 public class GraphicView extends JFrame implements IGameView {
 
@@ -33,27 +36,32 @@ public class GraphicView extends JFrame implements IGameView {
     }
 
     @Override
-    public void displayButton() {
+    public void displayActions() {
 
     }
 
     @Override
-    public void hiddenButton() {
+    public void hiddenActions() {
+
+    }
+
+//    @Override
+//    public void displayCard(int number, String type) {
+//
+//    }
+
+    @Override
+    public void displayHand(List<ICard> cards) {
 
     }
 
     @Override
-    public void displayCard(ICard card) {
+    public void displayGraveyard(List<ICard> cards) {
 
     }
 
     @Override
-    public void displayHand(IPlayer player) {
-
-    }
-
-    @Override
-    public void displayTable(Object o) {
+    public void displayBoard(List<ICenterStack> cards, List<IPlayer> players) {
 
     }
 
@@ -63,7 +71,7 @@ public class GraphicView extends JFrame implements IGameView {
     }
 
     @Override
-    public void cleanTable() {
+    public void cleanBoard() {
 
     }
 

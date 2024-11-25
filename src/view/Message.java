@@ -1,15 +1,23 @@
 package view;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Message extends JDialog {
-    private JPanel contentPane;
-    private JButton buttonOK;
-    private JLabel lblMessage;
+    private final JPanel contentPane;
+    private final JButton buttonOK;
+    private final JLabel lblMessage;
 
     public Message(String message) {
+        contentPane = new JPanel(new BorderLayout());
+        lblMessage = new JLabel(message,SwingConstants.CENTER);
+        buttonOK = new JButton("Ok");
+
+        contentPane.add(lblMessage,BorderLayout.CENTER);
+        contentPane.add((buttonOK), BorderLayout.SOUTH);
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);

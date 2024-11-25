@@ -4,9 +4,7 @@ import ar.edu.unlu.rmimvc.RMIMVCException;
 import ar.edu.unlu.rmimvc.Util;
 import ar.edu.unlu.rmimvc.cliente.Cliente;
 import controller.GameController;
-import view.ConfigPanel;
-import view.GraphicView;
-import view.IView;
+import view.*;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
@@ -51,7 +49,9 @@ public class AppClient {
 //                8888
 //        );
         GameController controller = new GameController();
-        IView view = new ConfigPanel(controller);
+        //IView view = new InitView(controller);
+        IGameView view = new ConsoleView("juan",controller);
+        controller.setView(view);
         Cliente c = null;
         try {
             c = new Cliente(AppClient.IP, Integer.parseInt(port), AppClient.IP, AppClient.PORT);

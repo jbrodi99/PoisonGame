@@ -1,16 +1,20 @@
 package view;
 
-import model.ICard;
-import model.IPlayer;
+import model.interfaces.ICard;
+import model.interfaces.ICenterStack;
+import model.interfaces.IPlayer;
+
+import java.util.List;
 
 public interface IGameView extends IView {
-    void displayButton();
-    void hiddenButton();
-    void displayCard(ICard card);
-    void displayHand(IPlayer player);
-    void displayTable(Object o);
+    void displayActions();
+    void hiddenActions();
+    //void displayCard(int number, String type);
+    void displayHand(List<ICard> cards);
+    void displayGraveyard(List<ICard> cards);
+    void displayBoard(List<ICenterStack> centers, List<IPlayer> players);
     void displayTablePoints(Object o, int points);
-    void cleanTable();
+    void cleanBoard();
     void finishGame(String message);
     void disconnect();
 }
