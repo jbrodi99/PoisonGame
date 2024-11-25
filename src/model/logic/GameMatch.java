@@ -1,10 +1,10 @@
 package model.logic;
 
 import model.enums.NUMBER;
-import model.enums.STATUS;
 import model.enums.TYPECARD;
 import model.exceptions.InvalidLimitPointsException;
 import model.exceptions.InvalidNumOfPlayerException;
+import model.exceptions.LostCardException;
 import model.interfaces.*;
 import model.validator.*;
 
@@ -42,9 +42,9 @@ public class GameMatch implements IGameMatch, Serializable {
         this.stacks = new ArrayList<>();
         this.playersConnected = new ArrayList<>();
         this.queueTurns = new LinkedList<>();
-        this.stacks.add(new CenterStack(TYPECARD.SWORD,new ValidatorSword()));
-        this.stacks.add(new CenterStack(TYPECARD.GOBLET,new ValidatorGoblet()));
-        this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN,new ValidatorGoldenCoin()));
+        this.stacks.add(new CenterStack(TYPECARD.SWORD));
+        this.stacks.add(new CenterStack(TYPECARD.GOBLET));
+        this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN));
         this.validatorPoints = new ValidatorLimitPoints();
         this.validatorPlayerCapacity = new ValidatorPlayerCapacity();
     }
@@ -110,7 +110,8 @@ public class GameMatch implements IGameMatch, Serializable {
     }
 
     @Override
-    public void dealHand() {
+    public void dealHand() throws LostCardException {
+        deck.shuffleDeck();
         for(IPlayer p : queueTurns){
             p.receiveHand(deck.removeFourCards());
         }
@@ -137,7 +138,7 @@ public class GameMatch implements IGameMatch, Serializable {
     }
 
     @Override
-    public void startGame() {
+    public void startGame() throws LostCardException {
         getCurrentPlayer().toggleTurn();    //Le doy el turno al primer jugador
         dealHand();
     }

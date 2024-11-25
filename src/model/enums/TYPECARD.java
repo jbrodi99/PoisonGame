@@ -2,10 +2,10 @@ package model.enums;
 
 
 public enum TYPECARD {
-    SWORD("espada"),
-    GOBLET("basto"),
-    GOLDEN_COIN("oro"),
-    CUP("copa");
+    SWORD("sword"),
+    GOBLET("goblet"),
+    GOLDEN_COIN("coin"),
+    CUP("cup");
 
     private final String name;
 

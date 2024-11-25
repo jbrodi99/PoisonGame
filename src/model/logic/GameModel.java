@@ -3,14 +3,10 @@ package model.logic;
 
 import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
-import com.sun.jdi.event.ExceptionEvent;
 import model.enums.EVENT;
 import model.enums.TYPECARD;
-import model.exceptions.InvalidLimitPointsException;
-import model.exceptions.InvalidNumOfPlayerException;
-import model.exceptions.InvalidTypeCardException;
+import model.exceptions.*;
 import model.interfaces.*;
-
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
@@ -26,6 +22,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     private IPlayerManager playerManager;
     private IRoundManager roundManager;
     private IGamePersistence gamePersistence;
+    private boolean exists = false;
 
     private GameModel(){
         //instanciar log, ranking y partida, pero creo que se deberían recuperar con objetos serializados, chequear...
@@ -57,6 +54,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         return gameMatch;
     }
 
+
     @Override
     public void close(IObservadorRemoto obs, int playerID) throws RemoteException {
         this.removerObservador(obs);
@@ -65,10 +63,10 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     }
 
     @Override
-    public void playTurn(int indexCard, int indexCenter) throws RemoteException, InvalidTypeCardException {
+    public void playTurn(int indexCard, int indexCenter) throws RemoteException, InvalidTypeCardException, LostCardException, CardIndexOutOfBoundsException {
         boolean valid = roundManager.checkMove(getGameMatch(),indexCard,indexCenter);
         if(!valid){
-            throw new InvalidTypeCardException("jugada invalida ");     //TODO: mejorar mensaje...
+            throw new InvalidTypeCardException("Select the correct center");
         }
         TYPECARD typeUsed = roundManager.playTurn(getGameMatch(),indexCard,indexCenter);
         notificarObservadores(EVENT.PLAYER_PLAYED_CARD);
@@ -97,22 +95,46 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     @Override
     public void initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException {
         getGameMatch().initGame(limitPoints,numOfPlayers);
+        exists = true;
     }
 
     @Override
-    public void startGame() throws RemoteException {
+    public void startGame() throws RemoteException, LostCardException {
         if(playerManager.isAllPlayersConnect(getGameMatch())){
             getGameMatch().startGame();
         }
     }
 
     @Override
-    public void connectPLayer(String userName, int id) throws RemoteException {
-        playerManager.connectPlayer(getGameMatch(),userName,id);
+    public int signIn(String userName) throws RemoteException, NonExistsPlayerException {
+        return log.signIn(userName);
+    }
+
+    @Override
+    public void signUp(String userName) throws RemoteException, PlayerAlreadyExistsException {
+        log.signUp(userName);
+    }
+
+    @Override
+    public void connectPLayer(String userName, int id) throws RemoteException, LostCardException {
+        playerManager.connectPlayer(getGameMatch(),userName, id);
+        notificarObservadores(EVENT.CONNECT_PLAYER);
         if(playerManager.isAllPlayersConnect(getGameMatch())){
             startGame();
             notificarObservadores(EVENT.ALL_PLAYERS_CONNECT);
         }
+    }
+
+    @Override
+    public boolean isPlayerConnect(int id) throws RemoteException {
+        boolean isConnect = false;
+        List<IPlayer> players = gameMatch.getPlayers();
+        for (IPlayer p : players){
+            if(p.areYou(id)){
+                isConnect = true;
+            }
+        }
+        return isConnect;
     }
 
     @Override
@@ -145,5 +167,10 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     @Override
     public IPlayer getPlayerByID(int id) throws RemoteException {
         return playerManager.getPlayerByID(getGameMatch(),id);
+    }
+
+    @Override
+    public boolean isExists() throws RemoteException{
+        return exists;
     }
 }

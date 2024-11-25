@@ -4,6 +4,7 @@ import model.interfaces.ICard;
 import model.interfaces.ICenterStack;
 import model.interfaces.IPlayer;
 
+import javax.swing.*;
 import java.util.List;
 
 public interface IGameView extends IView {
@@ -17,4 +18,5 @@ public interface IGameView extends IView {
     void cleanBoard();
     void finishGame(String message);
     void disconnect();
+    void waitPlayer(int players);
 }

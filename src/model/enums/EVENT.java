@@ -3,6 +3,7 @@ package model.enums;
 public enum EVENT {
     EXIT_GAME,
     ALL_PLAYERS_CONNECT,
+    CONNECT_PLAYER,
     DISCONNECT_PLAYER,
     PLAYER_PLAYED_CARD,
     NEXT_TURN,

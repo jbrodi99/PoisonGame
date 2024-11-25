@@ -1,6 +1,7 @@
 package view;
 
 import controller.GameController;
+import model.enums.TYPECARD;
 import model.interfaces.ICard;
 import model.interfaces.ICenterStack;
 import model.interfaces.IPlayer;
@@ -8,78 +9,82 @@ import model.interfaces.IPlayer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.rmi.RemoteException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ConsoleView extends JFrame implements IGameView {
+public class ConsoleView  implements IGameView {
 
     private final GameController controller;
+    private JFrame frame;
+    private JPanel consolePanel;
     private JTextArea txtOutput;
     private JTextField txtInput;
     private JButton btnEnter;
-    private ConsoleViewStatus statusConsole;
-    private final String name;
     public static boolean playing = false;
-//    private int points;
-//    private int numOfPlayers;
+    private static final Map<String, Integer> SUIT_MAP = new HashMap<>();
 
-    public ConsoleView(String name, GameController controller) {
-        this.controller = controller;
-        this.name = name;
-        setTitle("Veneno Consola");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setResizable(false);
-
-        initComponents();
+    static {
+        SUIT_MAP.put("sword", 1);
+        SUIT_MAP.put("goblet", 2);
+        SUIT_MAP.put("coin", 3);
     }
 
-    private void initComponents() {
+    public ConsoleView(GameController controller, JFrame frame) {
+            this.controller = controller;
+            this.frame = frame;
+            this.consolePanel = new JPanel(); // Panel principal.
+            initComponents();
+        }
 
-        txtOutput = new JTextArea();
-        txtOutput.setEditable(false);
-        Font font = new Font("Monospaced",Font.PLAIN,16);
-        txtOutput.setFont(font);
+        private void initComponents() {
+            consolePanel.setLayout(new BorderLayout());
 
-        txtInput = new JTextField();
-        btnEnter = new JButton("Enter");
+            // Configuración del área de salida.
+            txtOutput = new JTextArea();
+            txtOutput.setEditable(false);
+            txtOutput.setFont(new Font("Monospaced", Font.PLAIN, 16));
 
-        JPanel inputPanel = new JPanel(new BorderLayout());
-        inputPanel.add(txtInput,BorderLayout.CENTER);
-        inputPanel.add(btnEnter,BorderLayout.EAST);
+            // Configuración del campo de entrada y botón.
+            txtInput = new JTextField();
+            btnEnter = new JButton("Enter");
 
-        setLayout(new BorderLayout());
-        add(new JScrollPane(txtOutput),BorderLayout.CENTER);
-        add(inputPanel,BorderLayout.SOUTH);
+            JPanel inputPanel = new JPanel(new BorderLayout());
+            inputPanel.add(txtInput, BorderLayout.CENTER);
+            inputPanel.add(btnEnter, BorderLayout.EAST);
 
-        btnEnter.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                commandHandler(txtInput.getText());
-                txtInput.setText("");
-            }
-        });
+            // Agregar componentes al panel principal.
+            consolePanel.add(new JScrollPane(txtOutput), BorderLayout.CENTER);
+            consolePanel.add(inputPanel, BorderLayout.SOUTH);
 
-        btnEnter.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    commandHandler(txtInput.getText());
-                    txtInput.setText("");
+            // Configuración de eventos.
+            btnEnter.addActionListener(e -> processCommand());
+            txtInput.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        processCommand();
+                    }
                 }
-            }
-        });
+            });
 
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                controller.disconnectPlayer();
-                System.exit(0);
-            }
-        });
+            // Si necesitas manejar el cierre de la ventana.
+            frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    controller.disconnectPlayer();
+                    System.exit(0);
+                }
+            });
     }
 
+    private void processCommand() {
+        String command = txtInput.getText();
+        if (!command.isEmpty()) {
+            commandHandler(command);
+            txtInput.setText("");
+        }
+    }
     private void displaySeparator() {
         // Obtener el ancho de la ventana
         FontMetrics metrics = txtOutput.getFontMetrics(txtOutput.getFont());
@@ -107,11 +112,11 @@ public class ConsoleView extends JFrame implements IGameView {
     private void commandHandler(String command){
         command = command.toLowerCase();
         //ejecutar comando correspondiente...
-        if (command.equals("jugar")){
+        if (command.equals("play")){
             play(5,2);
-        } else if (command.startsWith("carta:")) {
+        } else if (command.startsWith("card:")) {
             playCard(command);
-        }   else if (command.startsWith("jugador:")) {
+        }   else if (command.startsWith("player:")) {
             setPlayer(command);
         } else if (command.equals("listo")) {
             controller.startGame();
@@ -128,7 +133,12 @@ public class ConsoleView extends JFrame implements IGameView {
 
     @Override
     public void init() {
-        setVisible(true);
+        frame.setVisible(true);
+    }
+
+    @Override
+    public JPanel getPanel() {
+        return consolePanel;
     }
 
     @Override
@@ -143,23 +153,6 @@ public class ConsoleView extends JFrame implements IGameView {
         txtInput.setEditable(false);
         txtInput.setText("");
     }
-
-//    @Override
-//    public void displayCard(int number, String type) {
-//        // Ancho fijo de la carta (sin contar los bordes)
-//        int cardWidth = 10;
-//
-//        // Construir la carta
-//        StringBuilder card = new StringBuilder();
-//        card.append("+------------+\n");
-//        card.append("| " + centerText(number + " " + type, cardWidth) + " |\n");
-//        card.append("| " + " ".repeat(cardWidth) + " |\n"); // Espacio vacío
-//        card.append("| " + centerText(type + " " + number, cardWidth) + " |\n");
-//        card.append("+------------+\n");
-//
-//        // Mostrar la carta en el área de texto
-//        println(card.toString());
-//    }
 
     /**
      * Centra un texto dentro de un espacio con ancho fijo.
@@ -180,6 +173,8 @@ public class ConsoleView extends JFrame implements IGameView {
     @Override
     public void displayHand(List<ICard> cards) {
 
+        println("Hand.");
+
         // Preparar las filas del formato
         StringBuilder topRow = new StringBuilder();
         StringBuilder middleRow1 = new StringBuilder();
@@ -199,7 +194,13 @@ public class ConsoleView extends JFrame implements IGameView {
             middle.append("|                | ");
             middleRow2.append("| " + centerText(suit + " " + number, 14) + " | ");
             bottomRow.append("+----------------+ ");
-            indexCard.append(centerText("" + currentIndex++,18));
+            if(card.getTypeCard() == TYPECARD.CUP){
+                indexCard.append(centerText("" + currentIndex++ + " any " ,18));
+
+            } else {
+                indexCard.append(centerText("" + currentIndex++  + " " + card.getTypeCard().getName() + " " ,18));
+            }
+
         }
 
         // Agregar las filas al área de texto
@@ -225,7 +226,12 @@ public class ConsoleView extends JFrame implements IGameView {
         println("Board\n");
 
         for(IPlayer player : players){
-            println(player.getUserName() + player.getHealth());
+            print(player.getUserName() + " " + player.getHealth());
+            if(player.isYourTurn()){
+                println(" (playing)");
+            } else {
+                println(" (waiting)");
+            }
         }
 
         displaySeparator();
@@ -246,22 +252,22 @@ public class ConsoleView extends JFrame implements IGameView {
                 double points = center.countPoints();
 
                 // Construir la representación de una carta
-                typeCenter.append(centerText(center.getTypecard().getName(),18));
+                typeCenter.append(centerText(center.getTypecard().getName() + " ",18));
                 topRow.append("+----------------+ ");
                 middleRow1.append("| " + centerText(topCard.getValue().getName() + " " + topCard.getTypeCard().getName(), 14) + " | ");
                 middle.append("|                | ");
                 middleRow2.append("| " + centerText(topCard.getTypeCard().getName() + " " + topCard.getValue().getName(), 14) + " | ");
                 bottomRow.append("+----------------+ ");
-                totalPoints.append(centerText("" + center.countPoints() ,17));
+                totalPoints.append(centerText("" + center.countPoints() ,18));
             } else {
                 // Recuadro vacío
-                typeCenter.append(centerText(center.getTypecard().getName(),18));
+                typeCenter.append(centerText(center.getTypecard().getName() + " ",18));
                 topRow.append("+----------------+ ");
                 middleRow1.append("|                | ");
                 middle.append("|                | ");
                 middleRow2.append("|                | ");
                 bottomRow.append("+----------------+ ");
-                totalPoints.append(centerText("0", 17)); // Sin puntos si está vacío
+                totalPoints.append(centerText("0", 18)); // Sin puntos si está vacío
             }
         }
 
@@ -289,13 +295,49 @@ public class ConsoleView extends JFrame implements IGameView {
 
     @Override
     public void finishGame(String message) {
-        println(message);
+        displayMessage(message);
     }
+
+    @Override
+    public void waitPlayer(int players) {
+        if (players <= 0) {
+            println("No hay jugadores esperando.");
+            return;
+        }
+        StringBuilder stickmen = new StringBuilder();
+
+        // Dibujar la cantidad de stickmans solicitados
+        for (int i = 0; i < players; i++) {
+            stickmen.append("      O      ");  // Cabeza
+        }
+        stickmen.append("\n");
+
+        for (int i = 0; i < players; i++) {
+            stickmen.append("     /|\\     "); // Brazos y torso
+        }
+        stickmen.append("\n");
+
+        for (int i = 0; i < players; i++) {
+            stickmen.append("     / \\     "); // Piernas
+        }
+        stickmen.append("\n");
+
+        for (int i = 0; i < players; i++) {
+            stickmen.append("Jugador ").append(i + 1).append("  "); // Etiquetas de jugadores
+        }
+        stickmen.append("\n");
+
+        stickmen.append("\nEsperando a que ").append(players).append(" jugador(es) estén listos...\n");
+
+        // Mostrar los stickmans en el área de texto
+        println(stickmen.toString());
+    }
+
 
     @Override
     public void disconnect() {
         println("Un jugador se ah desconectado, se guardara la partida para jugar luego.");
-        SwingUtilities.invokeLater(this::dispose);
+        SwingUtilities.invokeLater(() -> frame.dispose());
         SwingUtilities.invokeLater(() -> System.exit(0));
     }
 
@@ -311,22 +353,26 @@ public class ConsoleView extends JFrame implements IGameView {
     }
 
     private void playCard(String command){
-        String[] partes = command.split("\\s+"); // express.regular para separar por caracteres en blanco.
-        if (partes.length == 3){
+        String[] tokens = command.split("\\s+"); // express.regular para separar por caracteres en blanco.
+        if (tokens.length == 3){
            try{
-               int indexCard = Integer.parseInt(partes[1]);
-               int indexCenter = Integer.parseInt(partes[2]);
+               int indexCard = Integer.parseInt(tokens[1]);
+               int indexCenter = convertSuit(tokens[2]);
                try{
                    controller.playTurn(indexCard - 1, indexCenter - 1);
-               } catch (Exception e) {
-                   e.printStackTrace();
+               } catch (IndexOutOfBoundsException e) {
+                   displayMessage("The center valid is \"sword\", \"goblet\", \"coin\".");
                }
            }catch (NumberFormatException ex){
-               println("algo raro paso...");
+               println("The index of card is only number.");
            }
         } else {
-            println("Solo debe ingresar el numero de carta a jugar...");
+            println("The command \"card:\" is of de form card: \"index\" \"suit\".");
         }
+    }
+
+    private int convertSuit(String token) {
+        return SUIT_MAP.getOrDefault(token, 0);
     }
 
     private void setPlayer(String command){
@@ -335,7 +381,7 @@ public class ConsoleView extends JFrame implements IGameView {
             try{
                 int id = Integer.parseInt(partes[1]);
                 controller.setPlayerID(id);
-                controller.connectPlayer(partes[2],id);
+               // controller.connectPlayer(partes[2],id);
             } catch (Exception e){
                 e.printStackTrace();
             }

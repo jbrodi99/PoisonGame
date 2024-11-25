@@ -1,9 +1,10 @@
 package model.interfaces;
 
-import model.enums.STATUS;
-import model.enums.TYPECARD;
+
+
 import model.exceptions.InvalidLimitPointsException;
 import model.exceptions.InvalidNumOfPlayerException;
+import model.exceptions.LostCardException;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -23,10 +24,10 @@ public interface IGameMatch{
     int getTurnsPlayed();
     int getRoundsPlayed();
     int getRounds();
-    void dealHand();
+    void dealHand() throws LostCardException;
     void retrieveDeck();
     void estimateDamage();
-    void startGame() throws RemoteException;
+    void startGame() throws RemoteException, LostCardException;
     void endGame() throws RemoteException;
     void initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException;
     int getConnectedPlayers() throws RemoteException;
