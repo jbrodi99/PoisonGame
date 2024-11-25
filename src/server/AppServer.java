@@ -2,8 +2,8 @@ package server;
 
 import ar.edu.unlu.rmimvc.RMIMVCException;
 import ar.edu.unlu.rmimvc.servidor.Servidor;
-import model.GameModel;
-import model.IGameModel;
+import model.logic.GameModel;
+import model.interfaces.IGameModel;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
@@ -29,14 +29,14 @@ public class AppServer {
 //                null,
 //                8888
 //        );
-        String nombre =  JOptionPane.showInputDialog(null, "Ingrese el nombre de la partida a recuperar (deje vacio para una nueva)", "Nombre usuario", JOptionPane.QUESTION_MESSAGE);
+        //String nombre =  JOptionPane.showInputDialog(null, "Ingrese el nombre de la partida a recuperar (deje vacio para una nueva)", "Nombre usuario", JOptionPane.QUESTION_MESSAGE);
 
-        //IDomino juego = AdministradorPartidas.getPartidaJugador(nombre);
         IGameModel gameModel = null; //recuperar partida persistida
         Servidor servidor = new Servidor(AppServer.IP, AppServer.PORT);
         if (gameModel == null) {
             gameModel = GameModel.getInstance();
-            SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "No se encontro partida guardada, comenzara una nueva.", "Nueva partida", JOptionPane.INFORMATION_MESSAGE));
+            //SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "No se encontro partida guardada, comenzara una nueva.", "Nueva partida", JOptionPane.INFORMATION_MESSAGE));
+            SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "Comenzara una nueva Partida.", "Nueva partida", JOptionPane.INFORMATION_MESSAGE));
         } else
             SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "Se encontro una partida guardada, se retomara desde ese punto", "Cargar partida", JOptionPane.INFORMATION_MESSAGE));
 
