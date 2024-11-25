@@ -2,6 +2,7 @@ package model.logic;
 
 import model.enums.NUMBER;
 import model.enums.TYPECARD;
+import model.exceptions.LostCardException;
 import model.interfaces.ICard;
 import model.interfaces.IDeck;
 
@@ -48,9 +49,9 @@ public class Deck implements IDeck, Serializable {
     }
 
     @Override
-    public List<ICard> removeFourCards() {
+    public List<ICard> removeFourCards() throws LostCardException {
         if(cards.size() < 4){
-            //TODO: manejar exception
+            throw new LostCardException("Card lost exception.");
         }
         List<ICard> temp = new ArrayList<>(cards.subList(0,4));
         cards.subList(0,4).clear();

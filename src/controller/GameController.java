@@ -3,9 +3,7 @@ package controller;
 import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import model.enums.EVENT;
-import model.exceptions.InvalidLimitPointsException;
-import model.exceptions.InvalidNumOfPlayerException;
-import model.exceptions.InvalidTypeCardException;
+import model.exceptions.*;
 import model.interfaces.ICard;
 import model.interfaces.IEventMap;
 import model.interfaces.IGameModel;
@@ -64,6 +62,10 @@ public class GameController implements IControladorRemoto {
             view.displayMessage(e.getMessage());
         } catch (RemoteException e) {
             view.displayMessage("Error de red en play turn");
+        } catch (LostCardException e) {
+            view.displayMessage(e.getMessage());
+        } catch (CardIndexOutOfBoundsException e) {
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -76,6 +78,8 @@ public class GameController implements IControladorRemoto {
             model.startGame();
         } catch (RemoteException e) {
             view.displayMessage("error de red");
+        } catch (LostCardException e) {
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -102,6 +106,8 @@ public class GameController implements IControladorRemoto {
             model.connectPLayer(userName,id);
         } catch (RemoteException e) {
             view.displayMessage("error de red");
+        } catch (LostCardException e) {
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -163,12 +169,17 @@ public class GameController implements IControladorRemoto {
 
     private void nextTurnHandler()  {
         try {
+            IPlayer player = model.getPlayerByID(playerID);
             IPlayer currentPlayer = model.getCurrentPlayer();
             if (currentPlayer.areYou(playerID)) {
                 view.displayActions();
             } else {
-                view.hiddenActions(); //posible error chequear
+                view.hiddenActions();
             }
+            view.cleanBoard();
+            view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
+            view.displayHand(new ArrayList<>(player.viewHand()));
+            view.displayGraveyard(new ArrayList<>(player.getGraveyard()));
         } catch (RemoteException e) {
             view.displayMessage("network ERROR (next turn)");
         }

@@ -2,9 +2,7 @@ package model.interfaces;
 
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
-import model.exceptions.InvalidLimitPointsException;
-import model.exceptions.InvalidNumOfPlayerException;
-import model.exceptions.InvalidTypeCardException;
+import model.exceptions.*;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -15,10 +13,10 @@ public interface IGameModel extends IObservableRemoto {
     IRanking getRanking() throws RemoteException;
     IGameMatch getGameMatch() throws RemoteException;
     void close(IObservadorRemoto obs, int playerID) throws RemoteException;
-    void playTurn(int indexCard,int indexCenter) throws RemoteException, InvalidTypeCardException;
+    void playTurn(int indexCard,int indexCenter) throws RemoteException, InvalidTypeCardException, LostCardException, CardIndexOutOfBoundsException;
     void initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException;
-    void startGame() throws RemoteException;
-    void connectPLayer(String userName,int id) throws RemoteException;
+    void startGame() throws RemoteException, LostCardException;
+    void connectPLayer(String userName,int id) throws RemoteException, LostCardException;
     IPlayer getCurrentPlayer() throws RemoteException;
     void loadGame() throws RemoteException;
     void saveGame() throws RemoteException;

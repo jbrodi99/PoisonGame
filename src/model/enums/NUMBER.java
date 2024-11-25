@@ -1,18 +1,18 @@
 package model.enums;
 
 public enum NUMBER {
-    ONE("uno"),
-    TWO("dos"),
-    THREE("tres"),
-    FOUR("cuatro"),
-    FIVE("cinco"),
-    SIX("seis"),
-    SEVEN("siete"),
-    EIGHT("ocho"),
-    NINE("nueve"),
-    TEN("diez"),
-    ELEVEN("once"),
-    TWELVE("doce");
+    ONE("one"),
+    TWO("two"),
+    THREE("three"),
+    FOUR("four"),
+    FIVE("five"),
+    SIX("six"),
+    SEVEN("seven"),
+    EIGHT("eight"),
+    NINE("nine"),
+    TEN("ten"),
+    ELEVEN("eleven"),
+    TWELVE("twelve");
 
     private final String name;
 

@@ -1,6 +1,8 @@
 package model.logic;
 
 import model.enums.TYPECARD;
+import model.exceptions.CardIndexOutOfBoundsException;
+import model.exceptions.LostCardException;
 import model.interfaces.*;
 
 import java.io.Serializable;
@@ -11,14 +13,14 @@ public class RoundManager implements IRoundManager, Serializable {
     public static final int MOVES_PER_TURN = 4;
 
     @Override
-    public boolean checkMove(IGameMatch gameMatch, int indexCard, int indexCenter) throws RemoteException {
+    public boolean checkMove(IGameMatch gameMatch, int indexCard, int indexCenter) throws RemoteException, CardIndexOutOfBoundsException {
         TYPECARD typeCenter = gameMatch.getCenter(indexCenter).getTypecard();
         TYPECARD typeCardUsed = gameMatch.getCurrentPlayer().kindOfCard(indexCard);
         return typeCenter.compareType(typeCardUsed);
     }
 
     @Override
-    public TYPECARD playTurn(IGameMatch gameMatch, int indexCard, int center) throws RemoteException {
+    public TYPECARD playTurn(IGameMatch gameMatch, int indexCard, int center) throws RemoteException, CardIndexOutOfBoundsException {
         ICard cardPlayed = gameMatch.getCurrentPlayer().playCard(indexCard);
         gameMatch.getCenter(center).addCard(cardPlayed);
         return cardPlayed.getTypeCard();
@@ -40,7 +42,7 @@ public class RoundManager implements IRoundManager, Serializable {
     * true -> evento siguiente ronda
     * false -> evento reset game*/
     @Override
-    public boolean nextRound(IGameMatch gameMatch) throws RemoteException {
+    public boolean nextRound(IGameMatch gameMatch) throws LostCardException {
         gameMatch.resetTurns();
         if (hasNextRound(gameMatch)) {
             gameMatch.countRound();

@@ -6,9 +6,7 @@ import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 import com.sun.jdi.event.ExceptionEvent;
 import model.enums.EVENT;
 import model.enums.TYPECARD;
-import model.exceptions.InvalidLimitPointsException;
-import model.exceptions.InvalidNumOfPlayerException;
-import model.exceptions.InvalidTypeCardException;
+import model.exceptions.*;
 import model.interfaces.*;
 
 
@@ -65,10 +63,10 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     }
 
     @Override
-    public void playTurn(int indexCard, int indexCenter) throws RemoteException, InvalidTypeCardException {
+    public void playTurn(int indexCard, int indexCenter) throws RemoteException, InvalidTypeCardException, LostCardException, CardIndexOutOfBoundsException {
         boolean valid = roundManager.checkMove(getGameMatch(),indexCard,indexCenter);
         if(!valid){
-            throw new InvalidTypeCardException("jugada invalida ");     //TODO: mejorar mensaje...
+            throw new InvalidTypeCardException("Select the correct center");
         }
         TYPECARD typeUsed = roundManager.playTurn(getGameMatch(),indexCard,indexCenter);
         notificarObservadores(EVENT.PLAYER_PLAYED_CARD);
@@ -100,14 +98,14 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     }
 
     @Override
-    public void startGame() throws RemoteException {
+    public void startGame() throws RemoteException, LostCardException {
         if(playerManager.isAllPlayersConnect(getGameMatch())){
             getGameMatch().startGame();
         }
     }
 
     @Override
-    public void connectPLayer(String userName, int id) throws RemoteException {
+    public void connectPLayer(String userName, int id) throws RemoteException, LostCardException {
         playerManager.connectPlayer(getGameMatch(),userName,id);
         if(playerManager.isAllPlayersConnect(getGameMatch())){
             startGame();

@@ -1,6 +1,7 @@
 package view;
 
 import controller.GameController;
+import model.enums.TYPECARD;
 import model.interfaces.ICard;
 import model.interfaces.ICenterStack;
 import model.interfaces.IPlayer;
@@ -8,8 +9,9 @@ import model.interfaces.IPlayer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.rmi.RemoteException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConsoleView extends JFrame implements IGameView {
 
@@ -17,11 +19,15 @@ public class ConsoleView extends JFrame implements IGameView {
     private JTextArea txtOutput;
     private JTextField txtInput;
     private JButton btnEnter;
-    private ConsoleViewStatus statusConsole;
     private final String name;
     public static boolean playing = false;
-//    private int points;
-//    private int numOfPlayers;
+    private static final Map<String, Integer> SUIT_MAP = new HashMap<>();
+
+    static {
+        SUIT_MAP.put("sword", 1);
+        SUIT_MAP.put("goblet", 2);
+        SUIT_MAP.put("coin", 3);
+    }
 
     public ConsoleView(String name, GameController controller) {
         this.controller = controller;
@@ -62,6 +68,16 @@ public class ConsoleView extends JFrame implements IGameView {
         });
 
         btnEnter.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    commandHandler(txtInput.getText());
+                    txtInput.setText("");
+                }
+            }
+        });
+
+        txtInput.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
@@ -180,6 +196,8 @@ public class ConsoleView extends JFrame implements IGameView {
     @Override
     public void displayHand(List<ICard> cards) {
 
+        println("Hand.");
+
         // Preparar las filas del formato
         StringBuilder topRow = new StringBuilder();
         StringBuilder middleRow1 = new StringBuilder();
@@ -199,7 +217,13 @@ public class ConsoleView extends JFrame implements IGameView {
             middle.append("|                | ");
             middleRow2.append("| " + centerText(suit + " " + number, 14) + " | ");
             bottomRow.append("+----------------+ ");
-            indexCard.append(centerText("" + currentIndex++,18));
+            if(card.getTypeCard() == TYPECARD.CUP){
+                indexCard.append(centerText("" + currentIndex++ + " any " ,18));
+
+            } else {
+                indexCard.append(centerText("" + currentIndex++  + " " + card.getTypeCard().getName() + " " ,18));
+            }
+
         }
 
         // Agregar las filas al área de texto
@@ -225,7 +249,12 @@ public class ConsoleView extends JFrame implements IGameView {
         println("Board\n");
 
         for(IPlayer player : players){
-            println(player.getUserName() + player.getHealth());
+            print(player.getUserName() + " " + player.getHealth());
+            if(player.isYourTurn()){
+                println(" (playing)");
+            } else {
+                println(" (waiting)");
+            }
         }
 
         displaySeparator();
@@ -246,22 +275,22 @@ public class ConsoleView extends JFrame implements IGameView {
                 double points = center.countPoints();
 
                 // Construir la representación de una carta
-                typeCenter.append(centerText(center.getTypecard().getName(),18));
+                typeCenter.append(centerText(center.getTypecard().getName() + " ",18));
                 topRow.append("+----------------+ ");
                 middleRow1.append("| " + centerText(topCard.getValue().getName() + " " + topCard.getTypeCard().getName(), 14) + " | ");
                 middle.append("|                | ");
                 middleRow2.append("| " + centerText(topCard.getTypeCard().getName() + " " + topCard.getValue().getName(), 14) + " | ");
                 bottomRow.append("+----------------+ ");
-                totalPoints.append(centerText("" + center.countPoints() ,17));
+                totalPoints.append(centerText("" + center.countPoints() ,18));
             } else {
                 // Recuadro vacío
-                typeCenter.append(centerText(center.getTypecard().getName(),18));
+                typeCenter.append(centerText(center.getTypecard().getName() + " ",18));
                 topRow.append("+----------------+ ");
                 middleRow1.append("|                | ");
                 middle.append("|                | ");
                 middleRow2.append("|                | ");
                 bottomRow.append("+----------------+ ");
-                totalPoints.append(centerText("0", 17)); // Sin puntos si está vacío
+                totalPoints.append(centerText("0", 18)); // Sin puntos si está vacío
             }
         }
 
@@ -289,7 +318,7 @@ public class ConsoleView extends JFrame implements IGameView {
 
     @Override
     public void finishGame(String message) {
-        println(message);
+        displayMessage(message);
     }
 
     @Override
@@ -311,22 +340,26 @@ public class ConsoleView extends JFrame implements IGameView {
     }
 
     private void playCard(String command){
-        String[] partes = command.split("\\s+"); // express.regular para separar por caracteres en blanco.
-        if (partes.length == 3){
+        String[] tokens = command.split("\\s+"); // express.regular para separar por caracteres en blanco.
+        if (tokens.length == 3){
            try{
-               int indexCard = Integer.parseInt(partes[1]);
-               int indexCenter = Integer.parseInt(partes[2]);
+               int indexCard = Integer.parseInt(tokens[1]);
+               int indexCenter = convertSuit(tokens[2]);
                try{
                    controller.playTurn(indexCard - 1, indexCenter - 1);
-               } catch (Exception e) {
-                   e.printStackTrace();
+               } catch (IndexOutOfBoundsException e) {
+                   displayMessage("The center valid is \"sword\", \"goblet\", \"coin\".");
                }
            }catch (NumberFormatException ex){
-               println("algo raro paso...");
+               println("The index of card is only number.");
            }
         } else {
-            println("Solo debe ingresar el numero de carta a jugar...");
+            println("The command \"card:\" is of de form card: \"index\" \"suit\".");
         }
+    }
+
+    private int convertSuit(String token) {
+        return SUIT_MAP.getOrDefault(token, 0);
     }
 
     private void setPlayer(String command){

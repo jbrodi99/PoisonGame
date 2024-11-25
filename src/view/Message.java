@@ -14,6 +14,8 @@ public class Message extends JDialog {
         contentPane = new JPanel(new BorderLayout());
         lblMessage = new JLabel(message,SwingConstants.CENTER);
         buttonOK = new JButton("Ok");
+        Font font = new Font(Font.MONOSPACED, Font.BOLD,20);
+        lblMessage.setFont(font);
 
         contentPane.add(lblMessage,BorderLayout.CENTER);
         contentPane.add((buttonOK), BorderLayout.SOUTH);

@@ -1,6 +1,7 @@
 package model.logic;
 
 import model.enums.TYPECARD;
+import model.exceptions.CardIndexOutOfBoundsException;
 import model.interfaces.ICard;
 import model.interfaces.ICenterStack;
 import model.interfaces.IPlayer;
@@ -36,8 +37,12 @@ public class Player implements IPlayer, Serializable {
     }
 
     @Override
-    public ICard playCard(int index) {
-        return getHand().remove(index);
+    public ICard playCard(int index) throws CardIndexOutOfBoundsException {
+        try {
+            return getHand().remove(index);
+        } catch (IndexOutOfBoundsException e) {
+            throw new CardIndexOutOfBoundsException("non-existent card");
+        }
     }
 
     @Override
@@ -99,12 +104,21 @@ public class Player implements IPlayer, Serializable {
     }
 
     @Override
-    public TYPECARD kindOfCard(int index) {
-        return hand.get(index).getTypeCard();
+    public TYPECARD kindOfCard(int index) throws CardIndexOutOfBoundsException {
+        try {
+            return hand.get(index).getTypeCard();
+        } catch (IndexOutOfBoundsException e) {
+            throw new CardIndexOutOfBoundsException("non-existent card");
+        }
     }
 
     @Override
     public int getHealth() {
         return health;
+    }
+
+    @Override
+    public boolean isYourTurn() {
+        return turn;
     }
 }
