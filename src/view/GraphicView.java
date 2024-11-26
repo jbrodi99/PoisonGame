@@ -87,4 +87,9 @@ public class GraphicView extends JFrame implements IGameView {
     public void disconnect() {
 
     }
+
+    @Override
+    public void backToMenu() {
+
+    }
 }

@@ -5,7 +5,6 @@ import model.interfaces.IPlayer;
 import model.interfaces.IPlayerManager;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 
 public class PlayerManager implements IPlayerManager, Serializable {
 
@@ -21,16 +20,14 @@ public class PlayerManager implements IPlayerManager, Serializable {
     }
 
     @Override
-    public void disconnectPlayer(IGameMatch gameMatch,int id) throws RemoteException {
-        //modificar para usar jugadores conectados y no cola de turnos
+    public void disconnectPlayer(IGameMatch gameMatch,int id){
         IPlayer player = getPlayerByID(gameMatch,id);
         gameMatch.getQueueTurns().remove(player);
         gameMatch.getPlayers().remove(player);
     }
 
     @Override
-    public IPlayer getPlayerByID(IGameMatch gameMatch,int id) throws RemoteException {
-        //modificar para usar jugadores conectados y no cola de turnos
+    public IPlayer getPlayerByID(IGameMatch gameMatch,int id){
         for(IPlayer p : gameMatch.getAllPlayers()){
             if(p.areYou(id)){
                 return p;
@@ -46,12 +43,8 @@ public class PlayerManager implements IPlayerManager, Serializable {
         return gameMatch.getNumOfPLayers() == gameMatch.getPlayers().size();
     }
 
-
     @Override
     public String getNamePlayers() {
         return "";
     }
-
-
-
 }

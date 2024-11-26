@@ -113,13 +113,13 @@ public class ConsoleView  implements IGameView {
         command = command.toLowerCase();
         //ejecutar comando correspondiente...
         if (command.equals("play")){
-            play(5,2);
+            //play(5,2);
         } else if (command.startsWith("card:")) {
             playCard(command);
         }   else if (command.startsWith("player:")) {
-            setPlayer(command);
+            //setPlayer(command);
         } else if (command.equals("listo")) {
-            controller.startGame();
+            //controller.startGame();
         } else {
             displayMessage("Comando invalido.");
         }
@@ -249,7 +249,7 @@ public class ConsoleView  implements IGameView {
         for (ICenterStack center : centers) {
             if (!center.isEmpty()) {
                 ICard topCard = center.getTopCard();
-                double points = center.countPoints();
+                //double points = center.countPoints();
 
                 // Construir la representación de una carta
                 typeCenter.append(centerText(center.getTypecard().getName() + " ",18));
@@ -331,6 +331,12 @@ public class ConsoleView  implements IGameView {
 
         // Mostrar los stickmans en el área de texto
         println(stickmen.toString());
+
+        //Ajustar actualizacion, no funciona correctamente.
+//        frame.getContentPane().removeAll();
+//        frame.getContentPane().add(consolePanel);
+//        frame.revalidate();
+//        frame.repaint();
     }
 
 
@@ -341,16 +347,24 @@ public class ConsoleView  implements IGameView {
         SwingUtilities.invokeLater(() -> System.exit(0));
     }
 
-    private void play(int limitPoints, int numOfPlayers){
-        controller.initGame(limitPoints,numOfPlayers);
+    @Override
+    public void backToMenu() {
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(new MenuView(controller, frame).getPanel());
+        frame.revalidate();
+        frame.repaint();
     }
 
-    private void play(String command){
-        if(!ConsoleView.playing){
-            ConsoleView.playing = true;
-            controller.startGame();
-        }
-    }
+    //    private void play(int limitPoints, int numOfPlayers){
+//        controller.initGame(limitPoints,numOfPlayers);
+//    }
+
+//    private void play(String command){
+//        if(!ConsoleView.playing){
+//            ConsoleView.playing = true;
+//            controller.startGame();
+//        }
+//    }
 
     private void playCard(String command){
         String[] tokens = command.split("\\s+"); // express.regular para separar por caracteres en blanco.
@@ -375,16 +389,16 @@ public class ConsoleView  implements IGameView {
         return SUIT_MAP.getOrDefault(token, 0);
     }
 
-    private void setPlayer(String command){
-        String[] partes = command.split("\\s+"); // express.regular para separar por caracteres en blanco.
-        if(partes.length == 3){
-            try{
-                int id = Integer.parseInt(partes[1]);
-                controller.setPlayerID(id);
-               // controller.connectPlayer(partes[2],id);
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
+//    private void setPlayer(String command){
+//        String[] partes = command.split("\\s+"); // express.regular para separar por caracteres en blanco.
+//        if(partes.length == 3){
+//            try{
+//                int id = Integer.parseInt(partes[1]);
+//                controller.setPlayerID(id);
+//               // controller.connectPlayer(partes[2],id);
+//            } catch (Exception e){
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 }

@@ -16,16 +16,15 @@ import java.util.List;
 public class GameModel extends ObservableRemoto implements IGameModel, Serializable {
 
     private static IGameModel instance = null;
-    private ILog log;
-    private IRanking ranking;
-    private IGameMatch gameMatch;
-    private IPlayerManager playerManager;
-    private IRoundManager roundManager;
-    private IGamePersistence gamePersistence;
+    private final ILog log;
+    private final IRanking ranking;
+    private final IGameMatch gameMatch;
+    private final IPlayerManager playerManager;
+    private final IRoundManager roundManager;
+    private final IGamePersistence gamePersistence;
     private boolean exists = false;
 
     private GameModel(){
-        //instanciar log, ranking y partida, pero creo que se deberían recuperar con objetos serializados, chequear...
         log = Log.getInstance();
         ranking = Ranking.getInstance();
         gameMatch = GameMatch.getInstance();
@@ -39,21 +38,18 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         return instance;
     }
 
-    @Override
-    public ILog getLog() throws RemoteException {
+
+    private ILog getLog() throws RemoteException {
         return log;
     }
 
-    @Override
-    public IRanking getRanking() throws RemoteException {
+    private IRanking getRanking() throws RemoteException {
         return ranking;
     }
 
-    @Override
-    public IGameMatch getGameMatch() throws RemoteException {
+    private IGameMatch getGameMatch() throws RemoteException {
         return gameMatch;
     }
-
 
     @Override
     public void close(IObservadorRemoto obs, int playerID) throws RemoteException {
@@ -68,7 +64,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         if(!valid){
             throw new InvalidTypeCardException("Select the correct center");
         }
-        TYPECARD typeUsed = roundManager.playTurn(getGameMatch(),indexCard,indexCenter);
+        roundManager.playTurn(getGameMatch(),indexCard,indexCenter);
         notificarObservadores(EVENT.PLAYER_PLAYED_CARD);
         if (roundManager.checkAndApplySanction(getGameMatch(),indexCenter)){
             notificarObservadores(EVENT.PLAYER_TAKE_HEAP);
@@ -99,20 +95,13 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     }
 
     @Override
-    public void startGame() throws RemoteException, LostCardException {
-        if(playerManager.isAllPlayersConnect(getGameMatch())){
-            getGameMatch().startGame();
-        }
-    }
-
-    @Override
     public int signIn(String userName) throws RemoteException, NonExistsPlayerException {
-        return log.signIn(userName);
+        return getLog().signIn(userName);
     }
 
     @Override
     public void signUp(String userName) throws RemoteException, PlayerAlreadyExistsException {
-        log.signUp(userName);
+        getLog().signUp(userName);
     }
 
     @Override
@@ -120,7 +109,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         playerManager.connectPlayer(getGameMatch(),userName, id);
         notificarObservadores(EVENT.CONNECT_PLAYER);
         if(playerManager.isAllPlayersConnect(getGameMatch())){
-            startGame();
+            getGameMatch().startGame();
             notificarObservadores(EVENT.ALL_PLAYERS_CONNECT);
         }
     }

@@ -8,22 +8,28 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface IGameModel extends IObservableRemoto {
-    ILog getLog() throws RemoteException;
-    IRanking getRanking() throws RemoteException;
-    IGameMatch getGameMatch() throws RemoteException;
-    void close(IObservadorRemoto obs, int playerID) throws RemoteException;
-    void playTurn(int indexCard,int indexCenter) throws RemoteException, InvalidTypeCardException, LostCardException, CardIndexOutOfBoundsException;
+
+    //APIs
+
+    //Game logic
     void initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException;
-    void startGame() throws RemoteException, LostCardException;
-    void connectPLayer(String userName, int id) throws RemoteException, LostCardException;
+    void playTurn(int indexCard,int indexCenter) throws RemoteException, InvalidTypeCardException, LostCardException, CardIndexOutOfBoundsException;
+    boolean isExists() throws RemoteException;
+
+    //Getters
     IPlayer getCurrentPlayer() throws RemoteException;
-    void loadGame() throws RemoteException;
-    void saveGame() throws RemoteException;
+    IPlayer getPlayerByID(int id) throws RemoteException;
     List<ICenterStack> getAllCenters() throws RemoteException;
     List<IPlayer> getAllPlayers() throws RemoteException;
-    IPlayer getPlayerByID(int id) throws RemoteException;
-    boolean isExists() throws RemoteException;
+
+    //connection management
     int signIn(String userName) throws RemoteException, NonExistsPlayerException;
     void signUp(String userName) throws PlayerAlreadyExistsException, RemoteException;
+    void connectPLayer(String userName, int id) throws RemoteException, LostCardException;
     boolean isPlayerConnect(int id) throws RemoteException;
+
+    //APIs para implementar para el final
+    void loadGame() throws RemoteException;
+    void saveGame() throws RemoteException;
+    void close(IObservadorRemoto obs, int playerID) throws RemoteException;
 }
