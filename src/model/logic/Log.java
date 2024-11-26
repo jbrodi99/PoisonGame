@@ -5,11 +5,8 @@ import model.exceptions.PlayerAlreadyExistsException;
 import model.interfaces.ILog;
 import utils.Serializador;
 
-import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Log implements ILog, Serializable {
@@ -41,14 +38,14 @@ public class Log implements ILog, Serializable {
     }
 
     @Override
-    public int signUp(String userName) throws PlayerAlreadyExistsException {
+    public void signUp(String userName) throws PlayerAlreadyExistsException {
         if(isPlayer(userName)){
             throw new PlayerAlreadyExistsException("The player already exists. Please Sign In or Used other name.");
         }
         players.put(userName,idGenerator++);
         serializador.writeOneObject(players);
         serializador.addOneObject(idGenerator);
-        return players.get(userName);
+        players.get(userName);
     }
 
     @Override

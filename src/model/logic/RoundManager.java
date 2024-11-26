@@ -13,24 +13,22 @@ public class RoundManager implements IRoundManager, Serializable {
     public static final int MOVES_PER_TURN = 4;
 
     @Override
-    public boolean checkMove(IGameMatch gameMatch, int indexCard, int indexCenter) throws RemoteException, CardIndexOutOfBoundsException {
+    public boolean checkMove(IGameMatch gameMatch, int indexCard, int indexCenter) throws CardIndexOutOfBoundsException {
         TYPECARD typeCenter = gameMatch.getCenter(indexCenter).getTypecard();
         TYPECARD typeCardUsed = gameMatch.getCurrentPlayer().kindOfCard(indexCard);
         return typeCenter.compareType(typeCardUsed);
     }
 
     @Override
-    public TYPECARD playTurn(IGameMatch gameMatch, int indexCard, int center) throws RemoteException, CardIndexOutOfBoundsException {
-        ICard cardPlayed = gameMatch.getCurrentPlayer().playCard(indexCard);
-        gameMatch.getCenter(center).addCard(cardPlayed);
-        return cardPlayed.getTypeCard();
+    public void playTurn(IGameMatch gameMatch, int indexCard, int center) throws CardIndexOutOfBoundsException {
+        gameMatch.getCenter(center).addCard(gameMatch.getCurrentPlayer().playCard(indexCard));
     }
 
     /*
     * true -> siguiente ronda
     * */
     @Override
-    public boolean nextTurn(IGameMatch gameMatch) throws RemoteException {
+    public boolean nextTurn(IGameMatch gameMatch){
         gameMatch.getCurrentPlayer().toggleTurn();
         gameMatch.getQueueTurns().offer(gameMatch.getQueueTurns().poll());
         gameMatch.getCurrentPlayer().toggleTurn();
@@ -57,7 +55,7 @@ public class RoundManager implements IRoundManager, Serializable {
     }
 
     @Override
-    public boolean checkAndApplySanction(IGameMatch gameMatch, int indexCenter) throws RemoteException {
+    public boolean checkAndApplySanction(IGameMatch gameMatch, int indexCenter){
         ICenterStack centerUsed = gameMatch.getCenter(indexCenter);
         if(!centerUsed.isOverflowing())  return false;
         gameMatch.getCurrentPlayer().takeHeap(gameMatch.getCenter(indexCenter));

@@ -36,6 +36,10 @@ public class GameController implements IControladorRemoto {
         this.playerID = playerID;
     }
 
+    public int getPlayerID() {
+        return playerID;
+    }
+
     @Override
     public <T extends IObservableRemoto> void setModeloRemoto(T model) throws RemoteException {
         this.model = (IGameModel) model;
@@ -46,29 +50,13 @@ public class GameController implements IControladorRemoto {
         eventMap.trigger((EVENT) eventDetected);
     }
 
-    public int getPlayerID() {
-        return playerID;
-    }
-
-    public void disconnectPlayer() {
+    public void initGame(int limitPoints,int numOfPlayers) {
         try {
-            model.close(this, getPlayerID());
-        }catch (RemoteException e){
-            view.displayMessage("mistake has occurred.");
-        }
-    }
-
-    public void playTurn(int indexCard,int indexCenter) {
-        try {
-            model.playTurn(indexCard, indexCenter);
-        } catch (InvalidTypeCardException e) {
+            model.initGame(limitPoints,numOfPlayers);
+        }  catch (InvalidLimitPointsException | InvalidNumOfPlayerException e) {
             view.displayMessage(e.getMessage());
-        } catch (RemoteException e) {
-            view.displayMessage("Error de red en play turn");
-        } catch (LostCardException e) {
-            view.displayMessage(e.getMessage());
-        } catch (CardIndexOutOfBoundsException e) {
-            view.displayMessage(e.getMessage());
+        }  catch (RemoteException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -82,6 +70,23 @@ public class GameController implements IControladorRemoto {
         return exists;
     }
 
+    public void signIn(String userName){
+        try {
+            playerID = model.signIn(userName);
+            model.connectPLayer(userName,playerID);
+        }  catch (NonExistsPlayerException | LostCardException | RemoteException e) {
+            view.displayMessage(e.getMessage());
+        }
+    }
+
+    public void signUp(String userName){
+        try {
+            model.signUp(userName);
+        } catch (PlayerAlreadyExistsException | RemoteException  e) {
+            view.displayMessage(e.getMessage());
+        }
+    }
+
     public boolean isPlayerConnect(){
         boolean isConnect = false;
         try {
@@ -92,69 +97,50 @@ public class GameController implements IControladorRemoto {
         return isConnect;
     }
 
-    public void loadGame(){}
-
-    public void saveGame(){}
-
-    public void startGame() {
+    public void disconnectPlayer() {
         try {
-            model.startGame();
-        } catch (RemoteException e) {
-            view.displayMessage("error de red");
-        } catch (LostCardException e) {
+            model.close(this, getPlayerID());
+        }catch (RemoteException e){
             view.displayMessage(e.getMessage());
         }
     }
 
-    public void initGame(int limitPoints,int numOfPlayers) {
+    public void playTurn(int indexCard,int indexCenter) {
         try {
-            model.initGame(limitPoints,numOfPlayers);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidLimitPointsException e) {
-            view.displayMessage(e.getMessage());
-        } catch (InvalidNumOfPlayerException e) {
+            model.playTurn(indexCard, indexCenter);
+        } catch (InvalidTypeCardException | LostCardException | CardIndexOutOfBoundsException | RemoteException e) {
             view.displayMessage(e.getMessage());
         }
     }
 
-    public void signIn(String userName){
-        try {
-            playerID = model.signIn(userName);
-            model.connectPLayer(userName,playerID);
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        } catch (NonExistsPlayerException e) {
-            view.displayMessage(e.getMessage());
-        } catch (LostCardException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
+//    public void loadGame(){}
+//
+//    public void saveGame(){}
 
-    public void signUp(String userName){
-        try {
-            model.signUp(userName);
-        } catch (PlayerAlreadyExistsException e) {
-            view.displayMessage(e.getMessage());
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
+//    public void startGame() {
+//        try {
+//            model.startGame();
+//        } catch (RemoteException e) {
+//            view.displayMessage("error de red");
+//        } catch (LostCardException e) {
+//            view.displayMessage(e.getMessage());
+//        }
+//    }
 
-    public void connectPlayer(String userName) {
-        try {
-            model.connectPLayer(userName, playerID);
-            playerID = model.getCurrentPlayer().getId();
-        } catch (RemoteException e) {
-            view.displayMessage("error de red");
-        } catch (LostCardException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
+//    public void connectPlayer(String userName) {
+//        try {
+//            model.connectPLayer(userName, playerID);
+//            playerID = model.getCurrentPlayer().getId();
+//        } catch (RemoteException e) {
+//            view.displayMessage("error de red");
+//        } catch (LostCardException e) {
+//            view.displayMessage(e.getMessage());
+//        }
+//    }
 
-    public Map<String, Integer> getRanking() throws RemoteException {
-        return model.getRanking().getScore();
-    }
+//    public Map<String, Integer> getRanking() throws RemoteException {
+//        return model.getRanking().getScore();
+//    }
 
     private void registerEvents() {
         eventMap.register(EVENT.ALL_PLAYERS_CONNECT, this::allPlayerConnectHandler);
@@ -173,7 +159,6 @@ public class GameController implements IControladorRemoto {
     /*
     * EventHandlers:
     * */
-
     private void allPlayerConnectHandler() {
         try {
             view.cleanBoard();
@@ -182,20 +167,22 @@ public class GameController implements IControladorRemoto {
             if(whoStart.areYou(playerID)){
                 view.displayActions();
             }else{
-                view.hiddenActions(); //chequear si hace falta o dejo deshabilitado por defecto
+                view.hiddenActions();
             }
             view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
             view.displayHand(new ArrayList<>(iam.viewHand()));
             view.displayGraveyard(new ArrayList<>(iam.getGraveyard()));
         } catch (RemoteException e) {
-            view.displayMessage("Network Error (all players connect)");
+            view.displayMessage(e.getMessage());
         }
     }
 
     private void connectPlayerHandler() {
         try {
+            //IPlayer player = model.getPlayerByID(playerID);
             view.cleanBoard();
             view.waitPlayer(model.getAllPlayers().size());
+
         } catch (RemoteException e) {
             view.displayMessage(e.getMessage());
         }
@@ -213,7 +200,7 @@ public class GameController implements IControladorRemoto {
             view.displayHand(new ArrayList<>(player.viewHand()));
             view.displayGraveyard(new ArrayList<>(player.getGraveyard()));
         } catch (RemoteException e) {
-            view.displayMessage("Network ERROR!!! (playerPlayedCard)");
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -231,7 +218,7 @@ public class GameController implements IControladorRemoto {
             view.displayHand(new ArrayList<>(player.viewHand()));
             view.displayGraveyard(new ArrayList<>(player.getGraveyard()));
         } catch (RemoteException e) {
-            view.displayMessage("network ERROR (next turn)");
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -243,7 +230,7 @@ public class GameController implements IControladorRemoto {
             view.displayHand(new ArrayList<>(iam.viewHand()));
             view.displayGraveyard(new ArrayList<>(iam.getGraveyard()));
         } catch (RemoteException e) {
-            view.displayMessage("Network ERROR (next round)");
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -263,7 +250,7 @@ public class GameController implements IControladorRemoto {
             view.displayHand(new ArrayList<>(iam.viewHand()));
             view.displayGraveyard(new ArrayList<>(iam.getGraveyard()));
         } catch (RemoteException e) {
-            view.displayMessage("Network error (reset game)");
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -275,7 +262,7 @@ public class GameController implements IControladorRemoto {
             view.displayHand(new ArrayList<>(player.viewHand()));
             view.displayGraveyard(new ArrayList<>(player.getGraveyard()));
         } catch (RemoteException e) {
-            view.displayMessage("Network ERROR when player take heap!!!");
+            view.displayMessage(e.getMessage());
         }
     }
 
@@ -284,9 +271,10 @@ public class GameController implements IControladorRemoto {
             IPlayer winner = model.getCurrentPlayer();
             view.cleanBoard();
             view.hiddenActions();
+            view.backToMenu();
             view.finishGame("El jugador " + winner.getUserName() + " es el ganador!!!");
         } catch (RemoteException e) {
-            view.displayMessage("Network Error (winner)");
+            view.displayMessage(e.getMessage());
         }
     }
 }

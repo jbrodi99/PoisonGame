@@ -6,20 +6,24 @@ import model.exceptions.CardIndexOutOfBoundsException;
 import java.util.List;
 
 public interface IPlayer {
-    void receiveHand(List<ICard> cards);
+
+    //Getters
     int getHealth();
-    List<ICard> viewHand();
-    ICard playCard(int index) throws CardIndexOutOfBoundsException;
-    Integer countPoison();
-    void receiveDamage(Integer poison);
-    void takeHeap(ICenterStack centerStack);
     Integer getId();
     String getUserName();
-    void toggleTurn();
-    boolean isYourTurn();
     List<ICard> getGraveyard();
-    List<ICard> emptyYourGraveyard();
+    List<ICard> viewHand();
+
+    //API
+    void receiveHand(List<ICard> cards);
+    void receiveDamage(Integer poison);
+    void takeHeap(ICenterStack centerStack);
+    void toggleTurn();
+    int countPoison();
+    boolean isYourTurn();
     boolean isAlive();
     boolean areYou(int id);
+    ICard playCard(int index) throws CardIndexOutOfBoundsException;
+    List<ICard> emptyYourGraveyard();
     TYPECARD kindOfCard(int index) throws CardIndexOutOfBoundsException;
 }

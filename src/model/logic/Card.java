@@ -14,8 +14,8 @@ import java.io.Serializable;
  * @version 1.0
  */
 public class Card implements ICard, Serializable {
-    private NUMBER number;
-    private TYPECARD typeCard;
+    private final NUMBER number;
+    private final TYPECARD typeCard;
 
     public Card(NUMBER number, TYPECARD typeCard) {
         this.number = number;

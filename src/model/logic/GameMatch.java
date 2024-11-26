@@ -9,7 +9,6 @@ import model.interfaces.*;
 import model.validator.*;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -165,7 +164,7 @@ public class GameMatch implements IGameMatch, Serializable {
     }
 
     @Override
-    public int getPlayersAlive() throws RemoteException {
+    public int getPlayersAlive(){
         int alive = 0;
         for(IPlayer p : queueTurns){
             if(p.isAlive())   alive++;
@@ -184,12 +183,12 @@ public class GameMatch implements IGameMatch, Serializable {
     }
 
     @Override
-    public List<IPlayer> getAllPlayers() throws RemoteException {
+    public List<IPlayer> getAllPlayers(){
         return new ArrayList<>(playersConnected);
     }
 
     @Override
-    public List<ICenterStack> getAllCenters() throws RemoteException {
+    public List<ICenterStack> getAllCenters(){
         return new ArrayList<>(stacks);
     }
 }

@@ -15,7 +15,7 @@ import java.util.Random;
 public class Deck implements IDeck, Serializable {
 
     private static IDeck instance = null;
-    private List<ICard> cards = new ArrayList<>();
+    private final List<ICard> cards = new ArrayList<>();
 
     public static IDeck getInstance(){
         if(instance == null){
@@ -57,21 +57,4 @@ public class Deck implements IDeck, Serializable {
         cards.subList(0,4).clear();
         return temp;
     }
-
-    @Override
-    public Integer countCards() {
-        return getCards().size();
-    }
-
-    @Override
-    public ICard removeTopCard() {
-        return getCards().remove(0);
-    }
-
-    @Override
-    public Boolean isEmpty() {
-        return getCards().isEmpty();
-    }
-
-
 }

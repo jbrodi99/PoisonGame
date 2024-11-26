@@ -19,4 +19,5 @@ public interface IGameView extends IView {
     void finishGame(String message);
     void disconnect();
     void waitPlayer(int players);
+    void backToMenu();
 }

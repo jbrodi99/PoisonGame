@@ -46,8 +46,8 @@ public class Player implements IPlayer, Serializable {
     }
 
     @Override
-    public Integer countPoison() {
-        Integer poison = 0;
+    public int countPoison() {
+        int poison = 0;
         for (ICard c : getGraveyard()){
             if(c.isType(TYPECARD.CUP)){
                 poison++;
