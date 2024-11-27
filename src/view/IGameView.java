@@ -10,7 +10,6 @@ import java.util.List;
 public interface IGameView extends IView {
     void displayActions();
     void hiddenActions();
-    //void displayCard(int number, String type);
     void displayHand(List<ICard> cards);
     void displayGraveyard(List<ICard> cards);
     void displayBoard(List<ICenterStack> centers, List<IPlayer> players);

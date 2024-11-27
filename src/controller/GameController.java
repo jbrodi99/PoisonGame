@@ -12,7 +12,6 @@ import view.IGameView;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class GameController implements IControladorRemoto {
     private IGameView view;
@@ -30,10 +29,6 @@ public class GameController implements IControladorRemoto {
 
     public IGameView getView() {
         return view;
-    }
-
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
     }
 
     public int getPlayerID() {

@@ -4,7 +4,6 @@ package model.logic;
 import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 import model.enums.EVENT;
-import model.enums.TYPECARD;
 import model.exceptions.*;
 import model.interfaces.*;
 
