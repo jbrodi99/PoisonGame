@@ -2,9 +2,11 @@ package model.logic;
 
 import model.enums.NUMBER;
 import model.enums.TYPECARD;
-import model.exceptions.LostCardException;
+import model.factorys.ICardFactory;
 import model.interfaces.ICard;
+import model.interfaces.ICenterStack;
 import model.interfaces.IDeck;
+import model.interfaces.IPlayer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,47 +16,40 @@ import java.util.Random;
 
 public class Deck implements IDeck, Serializable {
 
-    private static IDeck instance = null;
+    private ICardFactory cardFactory;
     private final List<ICard> cards = new ArrayList<>();
 
-    public static IDeck getInstance(){
-        if(instance == null){
-            instance = new Deck();
-            return instance;
-        }
-        return instance;
-    }
-
-    private Deck() {
+    public Deck(ICardFactory cardFactory) {
+        this.cardFactory = cardFactory;
         for (NUMBER n : NUMBER.values()){
             for (TYPECARD t : TYPECARD.values()){
-                this.cards.add(new Card(n,t));
+                this.cards.add(cardFactory.createCard(n,t));
             }
         }
-        this.shuffleDeck();
+        shuffleDeck();
+    }
+
+    @Override
+    public void dealHand(List<IPlayer> players) {
+        for (IPlayer p : players){
+            p.receiveHand(new ArrayList<>(cards.subList(0,4)));
+            cards.subList(0,4).clear();
+        }
+    }
+
+    @Override
+    public void retrieveDeck(List<IPlayer> players, List<ICenterStack> centers) {
+        for (IPlayer p : players){
+            cards.addAll(p.emptyYourGraveyard());
+        }
+        for (ICenterStack c : centers){
+            cards.addAll(c.emptyStack());
+        }
     }
 
     @Override
     public void shuffleDeck() {
-        Collections.shuffle(getCards(),new Random(System.currentTimeMillis()));
+        Collections.shuffle(cards,new Random(System.currentTimeMillis()));
     }
 
-    public List<ICard> getCards() {
-        return cards;
-    }
-
-    @Override
-    public void addCards(List<ICard> cards) {
-        this.cards.addAll(cards);
-    }
-
-    @Override
-    public List<ICard> removeFourCards() throws LostCardException {
-        if(cards.size() < 4){
-            throw new LostCardException("Card lost exception.");
-        }
-        List<ICard> temp = new ArrayList<>(cards.subList(0,4));
-        cards.subList(0,4).clear();
-        return temp;
-    }
 }

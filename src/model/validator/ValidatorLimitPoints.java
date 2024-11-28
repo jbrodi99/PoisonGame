@@ -1,7 +1,5 @@
 package model.validator;
 
-import model.interfaces.IValidator;
-
 import java.io.Serializable;
 
 public class ValidatorLimitPoints implements IValidator<Integer>, Serializable {

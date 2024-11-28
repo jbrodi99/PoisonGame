@@ -1,10 +1,8 @@
 package model.logic;
 
 import model.enums.TYPECARD;
-import model.exceptions.InvalidTypeCardException;
 import model.interfaces.ICard;
 import model.interfaces.ICenterStack;
-import model.interfaces.IValidator;
 
 import java.io.Serializable;
 import java.util.ArrayList;

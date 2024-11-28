@@ -35,7 +35,7 @@ public class SignInView implements IView{
             String playerName = nameField.getText().trim();
             if (!playerName.isEmpty()) {
                 controller.signIn(playerName);
-                openLoginPanel();
+                //openLoginPanel();
             } else {
                 displayMessage("Please, input a valid name.");
             }

@@ -2,71 +2,99 @@ package model.logic;
 
 import model.enums.TYPECARD;
 import model.exceptions.CardIndexOutOfBoundsException;
-import model.exceptions.LostCardException;
+import model.factorys.IRoundFactory;
+import model.factorys.ITurnFactory;
+import model.factorys.RoundFactory;
 import model.interfaces.*;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 
 public class RoundManager implements IRoundManager, Serializable {
 
-    public static final int MOVES_PER_TURN = 4;
+    private static IRoundManager instance = null;
+
+    public static IRoundManager getInstance() {
+        if(instance == null)    instance = new RoundManager();
+        return instance;
+    }
 
     @Override
-    public boolean checkMove(IGameMatch gameMatch, int indexCard, int indexCenter) throws CardIndexOutOfBoundsException {
-        TYPECARD typeCenter = gameMatch.getCenter(indexCenter).getTypecard();
-        TYPECARD typeCardUsed = gameMatch.getCurrentPlayer().kindOfCard(indexCard);
+    public boolean checkValidMove(IGameMatch gameMatch, int indexCard, int indexCenter) throws CardIndexOutOfBoundsException {
+        TYPECARD typeCenter = gameMatch
+                .getCenter(indexCenter)
+                .getTypecard();
+        TYPECARD typeCardUsed = gameMatch
+                .getTurn()
+                .getCurrentPlayer()
+                .kindOfCard(indexCard);
         return typeCenter.compareType(typeCardUsed);
     }
 
     @Override
     public void playTurn(IGameMatch gameMatch, int indexCard, int center) throws CardIndexOutOfBoundsException {
-        gameMatch.getCenter(center).addCard(gameMatch.getCurrentPlayer().playCard(indexCard));
+        gameMatch
+                .getCenter(center)
+                .addCard(gameMatch
+                        .getTurn()
+                        .getCurrentPlayer()
+                        .playCard(indexCard)
+                );
     }
 
-    /*
-    * true -> siguiente ronda
-    * */
     @Override
-    public boolean nextTurn(IGameMatch gameMatch){
-        gameMatch.getCurrentPlayer().toggleTurn();
-        gameMatch.getQueueTurns().offer(gameMatch.getQueueTurns().poll());
-        gameMatch.getCurrentPlayer().toggleTurn();
-        gameMatch.countTurn();
-        return !hasNextTurn(gameMatch);
+    public void nextTurn(IGameMatch gameMatch){
+        gameMatch
+                .getTurn()
+                .getCurrentPlayer()
+                .toggleTurn();
+        gameMatch
+                .getTurn()
+                .next();
+        gameMatch
+                .getTurn()
+                .getCurrentPlayer()
+                .toggleTurn();
+        gameMatch.getTurn()
+                .countTurn();
     }
 
-    /*
-    * true -> evento siguiente ronda
-    * false -> evento reset game*/
     @Override
-    public boolean nextRound(IGameMatch gameMatch) throws LostCardException {
-        gameMatch.resetTurns();
-        if (hasNextRound(gameMatch)) {
-            gameMatch.countRound();
-            gameMatch.dealHand();
-            return true;
-        }
-        gameMatch.resetRounds();
+    public void nextRound(IGameMatch gameMatch) {
+        gameMatch.getTurn().resetTurns();
+        gameMatch.getRound().countRound();
+        gameMatch.getDeck().dealHand(gameMatch.getTurn().getPlayersAlive());
+    }
+
+    @Override
+    public void resetRound(IGameMatch gameMatch) {
+        gameMatch.getTurn().resetTurns();
+        gameMatch.getRound().resetRound();
         gameMatch.estimateDamage();
-        gameMatch.retrieveDeck();
-        gameMatch.dealHand();
-        return false;
+        gameMatch.getDeck().retrieveDeck(
+                gameMatch
+                        .getTurn()
+                        .getPlayersAlive(),
+                gameMatch.getAllCenters()
+                );
+        gameMatch.getDeck().dealHand(
+                gameMatch
+                        .getTurn()
+                        .getPlayersAlive()
+                );
     }
 
     @Override
-    public boolean checkAndApplySanction(IGameMatch gameMatch, int indexCenter){
-        ICenterStack centerUsed = gameMatch.getCenter(indexCenter);
-        if(!centerUsed.isOverflowing())  return false;
-        gameMatch.getCurrentPlayer().takeHeap(gameMatch.getCenter(indexCenter));
-        return true;
+    public boolean checkSanction(IGameMatch gameMatch, int indexCenter){
+        return gameMatch.getCenter(indexCenter).isOverflowing();
     }
 
-    private boolean hasNextTurn(IGameMatch gameMatch) {
-        return gameMatch.getTurnsPlayed() < gameMatch.getMovesPerRound();
-    }
-
-    private boolean hasNextRound(IGameMatch gameMatch) {
-        return gameMatch.getRoundsPlayed() < gameMatch.getRounds();
+    @Override
+    public void applySanction(IGameMatch gameMatch, int indexCenter) {
+        gameMatch
+                .getTurn()
+                .getCurrentPlayer()
+                .takeHeap(
+                        gameMatch.getCenter(indexCenter)
+                );
     }
 }

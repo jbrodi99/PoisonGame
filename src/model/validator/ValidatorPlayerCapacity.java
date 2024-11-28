@@ -1,7 +1,5 @@
 package model.validator;
 
-import model.interfaces.IValidator;
-
 import java.io.Serializable;
 
 public class ValidatorPlayerCapacity implements IValidator<Integer>, Serializable {
