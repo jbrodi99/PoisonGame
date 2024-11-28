@@ -12,8 +12,8 @@ public interface IGameModel extends IObservableRemoto {
     //APIs
 
     //Game logic
-    void initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException;
-    void playTurn(int indexCard,int indexCenter) throws RemoteException, InvalidTypeCardException, LostCardException, CardIndexOutOfBoundsException;
+    int initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException;
+    void playTurn(int indexCard,int indexCenter) throws Exception;
     boolean isExists() throws RemoteException;
 
     //Getters

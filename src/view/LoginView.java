@@ -28,13 +28,13 @@ public class LoginView implements IView {
 
         JButton lobbyBtn = new JButton("Play");
         lobbyBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        if(!controller.isPlayerConnect()){
-            lobbyBtn.setEnabled(false);
-            lobbyBtn.setVisible(false);
-        } else {
-            lobbyBtn.setEnabled(true);
-            lobbyBtn.setVisible(true);
-        }
+//        if(!controller.isPlayerConnect()){
+//            lobbyBtn.setEnabled(false);
+//            lobbyBtn.setVisible(false);
+//        } else {
+//            lobbyBtn.setEnabled(true);
+//            lobbyBtn.setVisible(true);
+//        }
 
         signInBtn.addActionListener(e -> {
             openSignInPanel();

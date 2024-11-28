@@ -6,8 +6,6 @@ import java.io.Serializable;
 
 public class SavedGame implements Serializable {
 
-    //TODO: This class is used for link the gameMatch and players to saveGame with Serializador
-
     private IGameMatch gameMatch;
     private final String[] players = new String[4];
     private final String playerNames;

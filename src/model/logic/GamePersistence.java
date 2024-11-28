@@ -12,8 +12,17 @@ import java.util.List;
 
 public class GamePersistence implements IGamePersistence, Serializable {
 
-    private Serializador serializador;
+    private static IGamePersistence instance = null;
+    private Serializador serializador = new Serializador("Games.dat");
     private List<SavedGame> gameList = new ArrayList<>();
+
+    public static IGamePersistence getInstance() {
+        if(instance == null) instance = new GamePersistence();
+        return instance;
+    }
+
+    private GamePersistence(){
+    }
 
     @Override
     public void loadGame(IGameMatch gameMatch, IPlayerManager playerManager) {

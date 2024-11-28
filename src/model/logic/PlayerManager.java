@@ -1,5 +1,6 @@
 package model.logic;
 
+import model.factorys.IPlayerFactory;
 import model.interfaces.IGameMatch;
 import model.interfaces.IPlayer;
 import model.interfaces.IPlayerManager;
@@ -8,39 +9,48 @@ import java.io.Serializable;
 
 public class PlayerManager implements IPlayerManager, Serializable {
 
+    private static IPlayerManager instance = null;
+    private IPlayerFactory playerFactory;
+
+    public static IPlayerManager getInstance(IPlayerFactory playerFactory) {
+        if(instance == null)    instance = new PlayerManager(playerFactory);
+        return instance;
+    }
+
+    private PlayerManager(IPlayerFactory playerFactory){
+        this.playerFactory = playerFactory;
+    }
+
     @Override
     public void connectPlayer(IGameMatch gameMatch, String userName, int id) {
-        //modificar para usar jugadores conectados y no cola de turnos
-        if(gameMatch.getQueueTurns().size() < gameMatch.getNumOfPLayers()){
-            IPlayer player = new Player(id,userName, gameMatch.getLimitPoints());
-            gameMatch.getPlayers().add(player);
-            gameMatch.getQueueTurns().offer(player);
+        if(gameMatch.getPlayerGroup().howManyPlayersAreOnline() >= gameMatch.getNumOfPLayers()){
+            throw new RuntimeException("La partida esta llena de jugadores. Unase a otra partida.");
         }
-        //TODO: Lanzar exception por exceder el limite de jugadores
+        IPlayer player = playerFactory.createPlayer(userName,id, gameMatch.getLimitPoints());
+        gameMatch.getTurn().addPLayer(player);
+        gameMatch.getPlayerGroup().addPlayer(player);
     }
 
     @Override
     public void disconnectPlayer(IGameMatch gameMatch,int id){
         IPlayer player = getPlayerByID(gameMatch,id);
-        gameMatch.getQueueTurns().remove(player);
-        gameMatch.getPlayers().remove(player);
+        gameMatch.getTurn().removePlayer(player);
+        gameMatch.getPlayerGroup().removePlayer(player);
     }
 
     @Override
     public IPlayer getPlayerByID(IGameMatch gameMatch,int id){
-        for(IPlayer p : gameMatch.getAllPlayers()){
+        for(IPlayer p : gameMatch.getPlayerGroup().getPlayers()){
             if(p.areYou(id)){
                 return p;
             }
         }
-        //TODO: manejar exception de jugador que no se encuentra en la partida
-        return null;
+        throw new RuntimeException("El jugador no se encuentra en la partida");
     }
 
     @Override
     public boolean isAllPlayersConnect(IGameMatch gameMatch) {
-        //modificar para usar jugadores conectados y no cola de turnos
-        return gameMatch.getNumOfPLayers() == gameMatch.getPlayers().size();
+        return gameMatch.getNumOfPLayers() == gameMatch.getPlayerGroup().howManyPlayersAreOnline();
     }
 
     @Override

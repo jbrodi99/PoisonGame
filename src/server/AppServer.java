@@ -2,6 +2,8 @@ package server;
 
 import ar.edu.unlu.rmimvc.RMIMVCException;
 import ar.edu.unlu.rmimvc.servidor.Servidor;
+import model.factorys.GameMatchFactory;
+import model.factorys.IGameMatchFactory;
 import model.logic.GameModel;
 import model.interfaces.IGameModel;
 
@@ -9,6 +11,7 @@ import javax.swing.*;
 import java.rmi.RemoteException;
 
 public class AppServer {
+    private static final IGameMatchFactory gameMatchFactory = new GameMatchFactory();
     private static final int PORT = 8888;
     private static final String IP = "127.0.0.1";
     public static void main(String[] args) throws RemoteException {
@@ -34,7 +37,7 @@ public class AppServer {
         IGameModel gameModel = null; //recuperar partida persistida
         Servidor servidor = new Servidor(AppServer.IP, AppServer.PORT);
         if (gameModel == null) {
-            gameModel = GameModel.getInstance();
+            gameModel = GameModel.getInstance(gameMatchFactory);
             //SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "No se encontro partida guardada, comenzara una nueva.", "Nueva partida", JOptionPane.INFORMATION_MESSAGE));
             SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "Comenzara una nueva Partida.", "Nueva partida", JOptionPane.INFORMATION_MESSAGE));
         } else

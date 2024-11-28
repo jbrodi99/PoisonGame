@@ -333,10 +333,7 @@ public class ConsoleView  implements IGameView {
         println(stickmen.toString());
 
         //Ajustar actualizacion, no funciona correctamente.
-//        frame.getContentPane().removeAll();
-//        frame.getContentPane().add(consolePanel);
-//        frame.revalidate();
-//        frame.repaint();
+        play();
     }
 
 
@@ -345,6 +342,13 @@ public class ConsoleView  implements IGameView {
         println("Un jugador se ah desconectado, se guardara la partida para jugar luego.");
         SwingUtilities.invokeLater(() -> frame.dispose());
         SwingUtilities.invokeLater(() -> System.exit(0));
+    }
+
+    public void play() {
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(controller.getView().getPanel());
+        frame.revalidate();
+        frame.repaint();
     }
 
     @Override

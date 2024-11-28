@@ -1,145 +1,40 @@
 package model.logic;
 
-import model.enums.NUMBER;
-import model.enums.TYPECARD;
-import model.exceptions.InvalidLimitPointsException;
-import model.exceptions.InvalidNumOfPlayerException;
-import model.exceptions.LostCardException;
+import model.factorys.ICenterFactory;
+import model.factorys.IRoundFactory;
+import model.factorys.ITurnFactory;
 import model.interfaces.*;
-import model.validator.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+
 
 public class GameMatch implements IGameMatch, Serializable {
 
-    private static IGameMatch instance = null;
-    private IDeck deck;
+    private final IDeck deck;
     private final List<ICenterStack> stacks;
-    private final List<IPlayer> playersConnected;
-    private final Queue<IPlayer> queueTurns;
-    private final IValidator<Integer> validatorPoints;
-    private final IValidator<Integer> validatorPlayerCapacity;
-    private int numOfPlayers;
-    private int limitPoints;
-    private int rounds;
-    private int roundsPlayed = 1;
-    private int movesPerRound;
-    private int turnsPlayed = 0;
+    private final IPlayerGroup playerGroup;
+    private final ITurn turn;
+    private final IRound round;
+    private final int numOfPlayers;
+    private final int limitPoints;
+    private final int id;
 
-    public static IGameMatch getInstance(){
-        if(instance == null){
-            instance = new GameMatch();
-        }
-        return instance;
-    }
-
-    private GameMatch(){
-        this.stacks = new ArrayList<>();
-        this.playersConnected = new ArrayList<>();
-        this.queueTurns = new LinkedList<>();
-        this.stacks.add(new CenterStack(TYPECARD.SWORD));
-        this.stacks.add(new CenterStack(TYPECARD.GOBLET));
-        this.stacks.add(new CenterStack(TYPECARD.GOLDEN_COIN));
-        this.validatorPoints = new ValidatorLimitPoints();
-        this.validatorPlayerCapacity = new ValidatorPlayerCapacity();
+    public GameMatch(ICenterFactory centerFactory, ITurnFactory turnFactory, IRoundFactory roundFactory, IPlayerGroup playerGroup, IDeck deck, int limitPoints, int numOfPlayers, int id){
+        this.limitPoints = limitPoints;
+        this.numOfPlayers = numOfPlayers;
+        this.stacks = centerFactory.createCenter();
+        this.playerGroup = playerGroup;
+        this.turn = turnFactory.createTurn(numOfPlayers);
+        this.round = roundFactory.createRound(numOfPlayers);
+        this.deck = deck;
+        this.id = id;
     }
 
     @Override
-    public ICenterStack getCenter(int pos) {
-        return stacks.get(pos);
-    }
-
-    @Override
-    public Queue<IPlayer> getQueueTurns() {
-        return queueTurns;
-    }
-
-    @Override
-    public List<IPlayer> getPlayers() {
-        return playersConnected;
-    }
-
-    @Override
-    public int getNumOfPLayers() {
-        return this.numOfPlayers;
-    }
-
-    public int getLimitPoints() {
-        return limitPoints;
-    }
-
-    public void countTurn(){
-        turnsPlayed++;
-    }
-
-    @Override
-    public void countRound() {
-        roundsPlayed++;
-    }
-
-    @Override
-    public void resetTurns() {
-        turnsPlayed = 0;
-    }
-
-    @Override
-    public void resetRounds() {
-        roundsPlayed = 1;
-    }
-
-    public int getMovesPerRound() {
-        return movesPerRound;
-    }
-
-    public int getTurnsPlayed() {
-        return turnsPlayed;
-    }
-
-    @Override
-    public int getRoundsPlayed() {
-        return roundsPlayed;
-    }
-
-    public int getRounds() {
-        return rounds;
-    }
-
-    @Override
-    public void dealHand() throws LostCardException {
-        deck.shuffleDeck();
-        for(IPlayer p : queueTurns){
-            p.receiveHand(deck.removeFourCards());
-        }
-    }
-
-    @Override
-    public void retrieveDeck() {
-        for(IPlayer p : queueTurns){
-            deck.addCards(p.emptyYourGraveyard());
-        }
-        for(ICenterStack center : stacks){
-            deck.addCards(center.emptyStack());
-        }
-    }
-
-    @Override
-    public void estimateDamage() {
-        for(IPlayer p : queueTurns){
-            p.receiveDamage(p.countPoison());
-            if(!p.isAlive() && queueTurns.size() > 1){
-                queueTurns.remove(p);
-            }
-        }
-    }
-
-    @Override
-    public void startGame() throws LostCardException {
-        getCurrentPlayer().toggleTurn();    //Le doy el turno al primer jugador
-        dealHand();
+    public void startGame() {
+        turn.getCurrentPlayer().toggleTurn();
+        deck.dealHand(turn.getPlayersAlive());
     }
 
     @Override
@@ -148,47 +43,64 @@ public class GameMatch implements IGameMatch, Serializable {
     }
 
     @Override
-    public void initGame(int limitPoints, int numOfPlayers) throws InvalidLimitPointsException, InvalidNumOfPlayerException {
-        if(!validatorPoints.validate(limitPoints))          throw new InvalidLimitPointsException("ERROR: valid range of points is... [" + ValidatorLimitPoints.MIN_POINTS + ", " + ValidatorLimitPoints.MAX_POINTS + " ]");
-        if(!validatorPlayerCapacity.validate(numOfPlayers)) throw new InvalidNumOfPlayerException("ERROR: valid range of points is... [" + ValidatorPlayerCapacity.MIX_PLAYERS + " , " + ValidatorPlayerCapacity.MAX_PLAYERS +"]");
-        this.numOfPlayers = numOfPlayers;
-        this.limitPoints = limitPoints;
-        this.deck = Deck.getInstance();
-        this.movesPerRound = RoundManager.MOVES_PER_TURN * numOfPlayers;
-        this.rounds = NUMBER.values().length / numOfPlayers;
+    public IDeck getDeck() {
+        return deck;
     }
 
     @Override
-    public int getConnectedPlayers() {
-        return playersConnected.size();
+    public IPlayerGroup getPlayerGroup() {
+        return playerGroup;
     }
 
     @Override
-    public int getPlayersAlive(){
-        int alive = 0;
-        for(IPlayer p : queueTurns){
-            if(p.isAlive())   alive++;
-        }
-        return alive;
+    public ITurn getTurn() {
+        return turn;
     }
 
     @Override
-    public boolean hasWinner() {
-        return queueTurns.size() == 1;
+    public IRound getRound() {
+        return round;
     }
 
     @Override
-    public IPlayer getCurrentPlayer() {
-        return queueTurns.peek();
+    public ICenterStack getCenter(int pos) {
+        return stacks.get(pos);
     }
 
     @Override
-    public List<IPlayer> getAllPlayers(){
-        return new ArrayList<>(playersConnected);
+    public int getNumOfPLayers() {
+        return this.numOfPlayers;
+    }
+
+    @Override
+    public int getLimitPoints() {
+        return limitPoints;
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     @Override
     public List<ICenterStack> getAllCenters(){
-        return new ArrayList<>(stacks);
+        return stacks;
+    }
+
+    @Override
+    public boolean hasWinner() {
+        return turn.getPlayersAlive().size() == 1;
+    }
+
+
+    //Cheaquear si esta responsabilidad es del juego
+    @Override
+    public void estimateDamage() {
+        for(IPlayer p : turn.getPlayersAlive()){
+            p.receiveDamage(p.countPoison());
+            if(!p.isAlive() && turn.getPlayersAlive().size() > 1){
+                turn.removePlayer(p);
+            }
+        }
     }
 }

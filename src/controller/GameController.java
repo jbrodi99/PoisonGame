@@ -18,6 +18,7 @@ public class GameController implements IControladorRemoto {
     private IGameModel model;
     private final IEventMap eventMap = new EventMap();
     private int playerID;
+    private int currentGameId;
 
     public GameController(){
         registerEvents();
@@ -47,7 +48,7 @@ public class GameController implements IControladorRemoto {
 
     public void initGame(int limitPoints,int numOfPlayers) {
         try {
-            model.initGame(limitPoints,numOfPlayers);
+            currentGameId = model.initGame(limitPoints,numOfPlayers);
         }  catch (InvalidLimitPointsException | InvalidNumOfPlayerException e) {
             view.displayMessage(e.getMessage());
         }  catch (RemoteException e) {
@@ -105,33 +106,15 @@ public class GameController implements IControladorRemoto {
             model.playTurn(indexCard, indexCenter);
         } catch (InvalidTypeCardException | LostCardException | CardIndexOutOfBoundsException | RemoteException e) {
             view.displayMessage(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-//    public void loadGame(){}
-//
-//    public void saveGame(){}
+    public void loadGame(){}
 
-//    public void startGame() {
-//        try {
-//            model.startGame();
-//        } catch (RemoteException e) {
-//            view.displayMessage("error de red");
-//        } catch (LostCardException e) {
-//            view.displayMessage(e.getMessage());
-//        }
-//    }
+    public void saveGame(){}
 
-//    public void connectPlayer(String userName) {
-//        try {
-//            model.connectPLayer(userName, playerID);
-//            playerID = model.getCurrentPlayer().getId();
-//        } catch (RemoteException e) {
-//            view.displayMessage("error de red");
-//        } catch (LostCardException e) {
-//            view.displayMessage(e.getMessage());
-//        }
-//    }
 
 //    public Map<String, Integer> getRanking() throws RemoteException {
 //        return model.getRanking().getScore();
@@ -174,10 +157,13 @@ public class GameController implements IControladorRemoto {
 
     private void connectPlayerHandler() {
         try {
-            //IPlayer player = model.getPlayerByID(playerID);
-            view.cleanBoard();
-            view.waitPlayer(model.getAllPlayers().size());
-
+            IPlayer player = model.getPlayerByID(playerID);
+            if(player != null){
+                //TODO:: Arrglar
+                view.cleanBoard();
+                view.hiddenActions();
+                view.waitPlayer(model.getAllPlayers().size());
+            }
         } catch (RemoteException e) {
             view.displayMessage(e.getMessage());
         }
