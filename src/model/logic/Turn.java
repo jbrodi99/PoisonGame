@@ -1,11 +1,14 @@
 package model.logic;
 
 import model.interfaces.IPlayer;
+import model.interfaces.IPlayerPublic;
 import model.interfaces.ITurn;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 public class Turn implements ITurn , Serializable {
 
@@ -47,7 +50,7 @@ public class Turn implements ITurn , Serializable {
 
     @Override
     public List<IPlayer> getPlayersAlive() {
-        return List.copyOf(queueTurns);
+        return new ArrayList<>(queueTurns);
     }
 
     @Override

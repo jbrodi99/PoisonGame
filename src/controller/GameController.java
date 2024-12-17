@@ -4,36 +4,56 @@ import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import model.enums.EVENT;
 import model.exceptions.*;
-import model.interfaces.IEventMap;
-import model.interfaces.IGameModel;
-import model.interfaces.IPlayer;
-import model.logic.EventMap;
-import view.IGameView;
+import model.interfaces.*;
+import utils.*;
+import view.interfaces.IGameView;
+import view.interfaces.IView;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class GameController implements IControladorRemoto {
+public class GameController implements IControladorRemoto, IGameController {
+    private IView popup;
     private IGameView view;
     private IGameModel model;
-    private final IEventMap eventMap = new EventMap();
+    private final IEventMap eventMap;
     private int playerID;
     private int currentGameId;
 
-    public GameController(){
+    public GameController(IEventMap eventMap, IView popup) {
+        this.eventMap = eventMap;
+        this.popup = popup;
         registerEvents();
+    }
+
+    @Override
+    public IView getPopup() {
+        return popup;
     }
 
     public void setView(IGameView view) {
         this.view = view;
     }
 
+    @Override
     public IGameView getView() {
         return view;
     }
 
+    @Override
     public int getPlayerID() {
         return playerID;
+    }
+
+    @Override
+    public int getCurrentGameID() {
+        return currentGameId;
+    }
+
+    @Override
+    public IGameModel getModel() {
+        return model;
     }
 
     @Override
@@ -43,219 +63,132 @@ public class GameController implements IControladorRemoto {
 
     @Override
     public void actualizar(IObservableRemoto iObservableRemoto, Object eventDetected) throws RemoteException {
-        eventMap.trigger((EVENT) eventDetected);
+        eventMap.trigger((IEventGame) eventDetected, currentGameId);
     }
 
-    public void initGame(int limitPoints,int numOfPlayers) {
+    public void initGame(int limitPoints, int numOfPlayers, String gameName, String host) {
         try {
-            currentGameId = model.initGame(limitPoints,numOfPlayers);
-        }  catch (InvalidLimitPointsException | InvalidNumOfPlayerException e) {
-            view.displayMessage(e.getMessage());
-        }  catch (RemoteException e) {
-            throw new RuntimeException(e);
+            currentGameId = model.initGame(limitPoints,numOfPlayers, gameName, host);
+        } catch (RemoteException | InvalidLimitPointsException | InvalidNumOfPlayerException e) {
+            popup.displayMessage(e.getMessage());
         }
     }
 
-    public boolean gameExists(){
-        boolean exists = false;
-        try {
-            exists =  model.isExists();
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-        return exists;
-    }
+//    public boolean gameExists() {
+//        boolean exists = false;
+//        try {
+//            exists = model.isExists(currentGameId);
+//        } catch (Exception e) {
+//            popup.displayMessage(e.getMessage());
+//        }
+//        return exists;
+//    }
 
-    public void signIn(String userName){
+    public boolean signIn(String userName) {
+        boolean status = false;
         try {
             playerID = model.signIn(userName);
-            model.connectPLayer(userName,playerID);
-        }  catch (NonExistsPlayerException | LostCardException | RemoteException e) {
-            view.displayMessage(e.getMessage());
+            status = true;
+            System.out.println(playerID);
+            System.out.println(status);
+            System.out.println(userName);
+        } catch (NonExistsPlayerException | RemoteException e) {
+            popup.displayMessage(e.getMessage());
         }
+        return status;
     }
 
-    public void signUp(String userName){
+    public void signUp(String userName) {
         try {
             model.signUp(userName);
-        } catch (PlayerAlreadyExistsException | RemoteException  e) {
-            view.displayMessage(e.getMessage());
+        } catch (RemoteException | PlayerAlreadyExistsException  e) {
+            popup.displayMessage(e.getMessage());
         }
     }
 
-    public boolean isPlayerConnect(){
-        boolean isConnect = false;
+    public boolean connectPlayer(String username){
+        boolean connect = false;
         try {
-            isConnect = model.isPlayerConnect(playerID);
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
+            model.connectPLayer(currentGameId,username,playerID);
+            connect = true;
+        } catch (RemoteException | LostCardException | GameCompleteException e) {
+            popup.displayMessage(e.getMessage());
+            return connect;
         }
-        return isConnect;
+        return connect;
+    }
+
+    public boolean connectPlayer(int gameID,String username){
+        boolean connect = false;
+        try {
+            currentGameId = gameID;
+            model.connectPLayer(gameID,username,playerID);
+            connect = true;
+        } catch (RemoteException | LostCardException | GameCompleteException e) {
+            popup.displayMessage(e.getMessage());
+            return connect;
+        }
+        return connect;
     }
 
     public void disconnectPlayer() {
         try {
-            model.close(this, getPlayerID());
-        }catch (RemoteException e){
-            view.displayMessage(e.getMessage());
+            model.close(this,playerID);
+        } catch (RemoteException e) {
+            popup.displayMessage(e.getMessage());
         }
     }
 
-    public void playTurn(int indexCard,int indexCenter) {
+    public void playTurn(int indexCard, int indexCenter) {
         try {
-            model.playTurn(indexCard, indexCenter);
-        } catch (InvalidTypeCardException | LostCardException | CardIndexOutOfBoundsException | RemoteException e) {
-            view.displayMessage(e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            model.playTurn(currentGameId,indexCard,indexCenter);
+        } catch (RemoteException | CardIndexOutOfBoundsException | LostCardException | InvalidTypeCardException e) {
+            popup.displayMessage(e.getMessage());
         }
     }
 
-    public void loadGame(){}
+    public List<IGameMatchStatusPublic> getMatches(){
+        List<IGameMatchStatusPublic> matches = new ArrayList<>();
+        try {
+            matches =  model.getAllMatches();
+            System.out.println(matches);
+        } catch (RemoteException e) {
+            popup.displayMessage(e.getMessage());
+        }
+        return matches;
+    }
 
-    public void saveGame(){}
+    public List<IPlayerPublic> getAllPlayers() {
+        List<IPlayerPublic> players = new ArrayList<>();
+        try {
+            players = model.getAllPlayers(currentGameId);
+        } catch (RemoteException e) {
+            popup.displayMessage(e.getMessage());
+        }
+        return players;
+    }
 
+    public void loadGame() {
+    }
+
+    public void saveGame() {
+    }
 
 //    public Map<String, Integer> getRanking() throws RemoteException {
 //        return model.getRanking().getScore();
 //    }
 
     private void registerEvents() {
-        eventMap.register(EVENT.ALL_PLAYERS_CONNECT, this::allPlayerConnectHandler);
-        eventMap.register(EVENT.DISCONNECT_PLAYER, this::disconnectPlayerHandler);
-        eventMap.register(EVENT.CONNECT_PLAYER, this::connectPlayerHandler);
-        eventMap.register(EVENT.PLAYER_PLAYED_CARD, this::playerPlayedCardHandler);
-        eventMap.register(EVENT.NEXT_TURN, this::nextTurnHandler);
-        eventMap.register(EVENT.NEXT_ROUND, this::nextRoundHandler);
-        eventMap.register(EVENT.LOAD_GAME, this::loadGameHandler);
-        eventMap.register(EVENT.SAVE_GAME, this::saveGameHandler);
-        eventMap.register(EVENT.RESET_GAME, this::resetGameHandler);
-        eventMap.register(EVENT.PLAYER_TAKE_HEAP, this::playerTakeHeapHandler);
-        eventMap.register(EVENT.WINNER, this::winnerHandler);
-    }
-
-    /*
-    * EventHandlers:
-    * */
-    private void allPlayerConnectHandler() {
-        try {
-            view.cleanBoard();
-            IPlayer iam = model.getPlayerByID(playerID);
-            IPlayer whoStart = model.getCurrentPlayer();
-            if(whoStart.areYou(playerID)){
-                view.displayActions();
-            }else{
-                view.hiddenActions();
-            }
-            view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
-            view.displayHand(new ArrayList<>(iam.viewHand()));
-            view.displayGraveyard(new ArrayList<>(iam.getGraveyard()));
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
-
-    private void connectPlayerHandler() {
-        try {
-            IPlayer player = model.getPlayerByID(playerID);
-            if(player != null){
-                //TODO:: Arrglar
-                view.cleanBoard();
-                view.hiddenActions();
-                view.waitPlayer(model.getAllPlayers().size());
-            }
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
-
-    private void disconnectPlayerHandler() {
-        // Código por implementar
-    }
-
-    private void playerPlayedCardHandler() {
-        try {
-            IPlayer player = model.getPlayerByID(playerID);
-            view.cleanBoard();
-            view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
-            view.displayHand(new ArrayList<>(player.viewHand()));
-            view.displayGraveyard(new ArrayList<>(player.getGraveyard()));
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
-
-    private void nextTurnHandler()  {
-        try {
-            IPlayer player = model.getPlayerByID(playerID);
-            IPlayer currentPlayer = model.getCurrentPlayer();
-            if (currentPlayer.areYou(playerID)) {
-                view.displayActions();
-            } else {
-                view.hiddenActions();
-            }
-            view.cleanBoard();
-            view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
-            view.displayHand(new ArrayList<>(player.viewHand()));
-            view.displayGraveyard(new ArrayList<>(player.getGraveyard()));
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
-
-    private void nextRoundHandler() {
-        try {
-            IPlayer iam = model.getPlayerByID(playerID);
-            view.cleanBoard();
-            view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
-            view.displayHand(new ArrayList<>(iam.viewHand()));
-            view.displayGraveyard(new ArrayList<>(iam.getGraveyard()));
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
-
-    private void loadGameHandler() {
-        // Código por implementar
-    }
-
-    private void saveGameHandler() {
-        // Código por implementar
-    }
-
-    private void resetGameHandler() {
-        try {
-            IPlayer iam = model.getPlayerByID(playerID);
-            view.cleanBoard();
-            view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
-            view.displayHand(new ArrayList<>(iam.viewHand()));
-            view.displayGraveyard(new ArrayList<>(iam.getGraveyard()));
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
-
-    private void playerTakeHeapHandler() {
-        try {
-            IPlayer player = model.getPlayerByID(playerID);
-            view.cleanBoard();
-            view.displayBoard(new ArrayList<>(model.getAllCenters()), new ArrayList<>(model.getAllPlayers()));
-            view.displayHand(new ArrayList<>(player.viewHand()));
-            view.displayGraveyard(new ArrayList<>(player.getGraveyard()));
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
-    }
-
-    private void winnerHandler(){
-        try {
-            IPlayer winner = model.getCurrentPlayer();
-            view.cleanBoard();
-            view.hiddenActions();
-            view.backToMenu();
-            view.finishGame("El jugador " + winner.getUserName() + " es el ganador!!!");
-        } catch (RemoteException e) {
-            view.displayMessage(e.getMessage());
-        }
+        eventMap.register(EVENT.ALL_PLAYERS_CONNECT, new AllPlayersConnectController(this));
+        eventMap.register(EVENT.DISCONNECT_PLAYER, new DisconnectPlayerController(this));
+        eventMap.register(EVENT.CONNECT_PLAYER, new ConnectPlayerController(this));
+        eventMap.register(EVENT.PLAYER_PLAYED_CARD, new PlayerPlayedCardController(this));
+        eventMap.register(EVENT.NEXT_TURN, new NextTurnController(this));
+        eventMap.register(EVENT.NEXT_ROUND, new NextRoundController(this));
+        eventMap.register(EVENT.LOAD_GAME, new LoadGameController(this));
+        eventMap.register(EVENT.SAVE_GAME, new SaveGameController(this));
+        eventMap.register(EVENT.RESET_GAME, new ResetGameController(this));
+        eventMap.register(EVENT.PLAYER_TAKE_HEAP, new PlayerTakeHeapController(this));
+        eventMap.register(EVENT.WINNER, new WinnerController(this));
     }
 }

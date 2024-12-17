@@ -16,19 +16,15 @@ public class GameMatch implements IGameMatch, Serializable {
     private final IPlayerGroup playerGroup;
     private final ITurn turn;
     private final IRound round;
-    private final int numOfPlayers;
-    private final int limitPoints;
-    private final int id;
+    private final IGameMatchStatus status;
 
-    public GameMatch(ICenterFactory centerFactory, ITurnFactory turnFactory, IRoundFactory roundFactory, IPlayerGroup playerGroup, IDeck deck, int limitPoints, int numOfPlayers, int id){
-        this.limitPoints = limitPoints;
-        this.numOfPlayers = numOfPlayers;
+    public GameMatch(ICenterFactory centerFactory, ITurnFactory turnFactory, IRoundFactory roundFactory, IPlayerGroup playerGroup, IDeck deck, IGameMatchStatus status){
         this.stacks = centerFactory.createCenter();
         this.playerGroup = playerGroup;
-        this.turn = turnFactory.createTurn(numOfPlayers);
-        this.round = roundFactory.createRound(numOfPlayers);
         this.deck = deck;
-        this.id = id;
+        this.status = status;
+        this.turn = turnFactory.createTurn(status.getNumOfPLayers());
+        this.round = roundFactory.createRound(status.getNumOfPLayers());
     }
 
     @Override
@@ -45,6 +41,11 @@ public class GameMatch implements IGameMatch, Serializable {
     @Override
     public IDeck getDeck() {
         return deck;
+    }
+
+    @Override
+    public IGameMatchStatus getStatus() {
+        return status;
     }
 
     @Override
@@ -68,21 +69,6 @@ public class GameMatch implements IGameMatch, Serializable {
     }
 
     @Override
-    public int getNumOfPLayers() {
-        return this.numOfPlayers;
-    }
-
-    @Override
-    public int getLimitPoints() {
-        return limitPoints;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
     public List<ICenterStack> getAllCenters(){
         return stacks;
     }
@@ -91,7 +77,6 @@ public class GameMatch implements IGameMatch, Serializable {
     public boolean hasWinner() {
         return turn.getPlayersAlive().size() == 1;
     }
-
 
     //Cheaquear si esta responsabilidad es del juego
     @Override
