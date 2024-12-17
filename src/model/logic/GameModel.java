@@ -1,20 +1,22 @@
 package model.logic;
 
-
 import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
-import com.sun.source.tree.NewArrayTree;
 import model.commands.Command;
 import model.enums.EVENT;
+import model.enums.STATUS;
 import model.exceptions.*;
 import model.factorys.*;
 import model.interfaces.*;
+import utils.*;
+
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 public class GameModel extends ObservableRemoto implements IGameModel, Serializable {
 
@@ -22,12 +24,12 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     private final ILog log;
     private final IRanking ranking;
     private final IGameMatchFactory gameMatchFactory;
-    private Map<Integer, IGameMatch> matches;
-    private IGameMatch gameMatch;
+    private final Map<Integer, IGameMatch> matches = new HashMap<>();
+    //private IGameMatch gameMatch;
     private final IPlayerManager playerManager;
     private final IRoundManager roundManager;
     private final IGamePersistence gamePersistence;
-    private boolean exists = false;
+    private final IIDGenerator generator;
 
     private GameModel(IGameMatchFactory gameMatchFactory) {
         log = Log.getInstance();
@@ -35,6 +37,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         playerManager = PlayerManager.getInstance(new PlayerFactory());
         roundManager = RoundManager.getInstance();
         gamePersistence = GamePersistence.getInstance();
+        generator = GameIDGenerator.getInstance();
         this.gameMatchFactory = gameMatchFactory;
     }
 
@@ -51,9 +54,9 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         return ranking;
     }
 
-    private IGameMatch getGameMatch() throws RemoteException {
-        return gameMatch;
-    }
+//    private IGameMatch getGameMatch() throws RemoteException {
+//        return gameMatch;
+//    }
 
     @Override
     public int signIn(String userName) throws RemoteException, NonExistsPlayerException {
@@ -65,108 +68,116 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         getLog().signUp(userName);
     }
 
-//    @Override
-//    public int initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException {
-//        gameMatch = gameMatchFactory.createGameMatch(
-//                new CenterFactory(),
-//                new TurnFactory(),
-//                new RoundFactory(),
-//                new PlayerGroup(),
-//                new Deck(new CardFactory()),
-//                limitPoints,
-//                numOfPlayers
-//        );
-//        exists = true;
-//        return gameMatch.getId();
-//    }
-
     @Override
-    public int initGame(int limitPoints, int numOfPlayers) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException {
-        IGameMatch gameMatchT = gameMatchFactory.createGameMatch(
+    public int initGame(int limitPoints, int numOfPlayers, String gameName, String hostName) throws RemoteException, InvalidLimitPointsException, InvalidNumOfPlayerException {
+        IGameMatch gameMatch = gameMatchFactory.createGameMatch(
                 new CenterFactory(),
                 new TurnFactory(),
                 new RoundFactory(),
                 new PlayerGroup(),
                 new Deck(new CardFactory()),
-                limitPoints,
-                numOfPlayers
+                new GameMatchStatus(generator.nextID(),gameName,hostName,numOfPlayers,limitPoints, STATUS.WAITING)
         );
-        matches.put(gameMatchT.getId(),gameMatchT);
-        exists = true;
-        return gameMatch.getId();
+        matches.put(gameMatch.getStatus().getId(),gameMatch);
+        return gameMatch.getStatus().getId();
     }
 
     @Override
     public void close(IObservadorRemoto obs, int playerID) throws RemoteException {
         this.removerObservador(obs);
-        playerManager.disconnectPlayer(gameMatch,playerID);
-        notificarObservadores(EVENT.DISCONNECT_PLAYER);
+        //playerManager.disconnectPlayer(gameMatch,playerID);
+        //TODO: pasar game id para desconectarlo del juego tambien
+        notificarObservadores(1);
     }
 
     @Override
-    public void playTurn(int indexCard, int indexCenter) throws RemoteException, CardIndexOutOfBoundsException, InvalidTypeCardException, LostCardException {
+    public void playTurn(int gameID,int indexCard, int indexCenter) throws RemoteException, CardIndexOutOfBoundsException, InvalidTypeCardException, LostCardException {
+        IGameMatch match = matches.get(gameID);
+
         GameInvoker invoker = new GameInvoker();
 
-        invoker.addCommand(() -> checkValidMoveHandler(roundManager,gameMatch,indexCard,indexCenter));
-        invoker.addCommand(() -> playTurnHandler(roundManager,gameMatch,indexCard,indexCenter));
-        invoker.addCommand(() -> nextTurnHandler(roundManager,gameMatch));
-        invoker.addCommand(() -> nextRoundHandler(roundManager,gameMatch));
-        invoker.addCommand(() -> resetRoundHandler(roundManager,gameMatch));
-        invoker.addCommand(() -> hasWinnerHandler(roundManager,gameMatch));
+        invoker.addCommand(() -> checkValidMoveHandler(roundManager,match,indexCard,indexCenter));
+        invoker.addCommand(() -> playTurnHandler(roundManager,match,indexCard,indexCenter));
+        invoker.addCommand(() -> checkAndApplySanction(roundManager,match,indexCenter));
+        invoker.addCommand(() -> nextTurnHandler(roundManager,match));
+        invoker.addCommand(() -> nextRoundHandler(roundManager,match));
+        invoker.addCommand(() -> resetRoundHandler(roundManager,match));
+        invoker.addCommand(() -> hasWinnerHandler(match));
 
         invoker.executeCommands();
     }
 
     @Override
-    public void connectPLayer(String userName, int id) throws RemoteException, LostCardException {
-        playerManager.connectPlayer(getGameMatch(),userName, id);
-        notificarObservadores(EVENT.CONNECT_PLAYER);
-        if(playerManager.isAllPlayersConnect(getGameMatch())){
-            getGameMatch().startGame();
-            notificarObservadores(EVENT.ALL_PLAYERS_CONNECT);
+    public void connectPLayer(int gameID,String userName, int id) throws RemoteException, LostCardException, GameCompleteException {
+        IGameMatch match = matches.get(gameID);
+
+        playerManager.connectPlayer(match,userName, id);
+//        notificarObservadores(EVENT.CONNECT_PLAYER);
+        notificarObservadores(new EventGame(EVENT.CONNECT_PLAYER, gameID));
+        if(playerManager.isAllPlayersConnect(match)){
+            match.getStatus().setStatus(STATUS.COMPLETE);
+            match.startGame();
+//            notificarObservadores(EVENT.ALL_PLAYERS_CONNECT);
+            notificarObservadores(new EventGame(EVENT.ALL_PLAYERS_CONNECT, gameID));
         }
     }
 
     @Override
-    public boolean isPlayerConnect(int id) throws RemoteException {
-        return gameMatch.getPlayerGroup().isPLayerConnect(playerManager.getPlayerByID(gameMatch,id));
+    public boolean isPlayerConnect(int gameID,int id) throws RemoteException {
+        IGameMatch match = matches.get(gameID);
+        return match.getPlayerGroup().isPLayerConnect(playerManager.getPlayerByID(match,id));
     }
 
     @Override
-    public IPlayer getCurrentPlayer() throws RemoteException {
-        return gameMatch.getTurn().getCurrentPlayer();
+    public IPlayerPublic getCurrentPlayer(int gameID) throws RemoteException {
+        IGameMatch match = matches.get(gameID);
+
+        return match.getTurn().getCurrentPlayer();
     }
 
     @Override
     public void loadGame() throws RemoteException {
-        gamePersistence.loadGame(gameMatch,playerManager);
+        //gamePersistence.loadGame(gameMatch,playerManager);
         notificarObservadores(EVENT.LOAD_GAME);
     }
 
     @Override
     public void saveGame() throws RemoteException {
-        gamePersistence.saveGame(gameMatch,playerManager);
+        //gamePersistence.saveGame(gameMatch,playerManager);
         notificarObservadores(EVENT.SAVE_GAME);
     }
 
     @Override
-    public List<ICenterStack> getAllCenters() throws RemoteException {
-        return getGameMatch().getAllCenters();
+    public List<ICenterStack> getAllCenters(int gameID) throws RemoteException {
+        IGameMatch match = matches.get(gameID);
+        return match.getAllCenters();
     }
 
     @Override
-    public List<IPlayer> getAllPlayers() throws RemoteException {
-        return getGameMatch().getTurn().getPlayersAlive();
+    public List<IPlayerPublic> getAllPlayers(int gameID) throws RemoteException {
+        IGameMatch match = matches.get(gameID);
+        return new ArrayList<>(match.getTurn().getPlayersAlive());
     }
 
     @Override
-    public IPlayer getPlayerByID(int id) throws RemoteException {
-        return playerManager.getPlayerByID(getGameMatch(),id);
+    public IPlayerPublic getPlayerByID(int gameID,int id) throws RemoteException {
+        IGameMatch match = matches.get(gameID);
+
+        return playerManager.getPlayerByID(match,id);
     }
 
+//    @Override
+//    public boolean isExists(int gameID) throws RemoteException{
+//        return matches.containsKey(gameID);
+//    }
+
     @Override
-    public boolean isExists() throws RemoteException{
-        return exists;
+    public List<IGameMatchStatusPublic> getAllMatches() throws RemoteException {
+        return matches
+                .values()
+                .stream()
+                .map(IGameMatch::getStatus)
+                .collect(Collectors.toList());
     }
 
     private class GameInvoker implements Serializable {
@@ -192,18 +203,28 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
 
     private void playTurnHandler(IRoundManager roundManager, IGameMatch gameMatch, int indexCard, int indexCenter) throws CardIndexOutOfBoundsException, RemoteException {
         roundManager.playTurn(gameMatch,indexCard,indexCenter);
-        notificarObservadores(EVENT.PLAYER_PLAYED_CARD);
+//        notificarObservadores(EVENT.PLAYER_PLAYED_CARD);
+        notificarObservadores(new EventGame(EVENT.PLAYER_PLAYED_CARD, gameMatch.getStatus().getId()));
     }
 
     private void nextTurnHandler(IRoundManager roundManager, IGameMatch gameMatch) throws RemoteException {
         roundManager.nextTurn(gameMatch);
-        notificarObservadores(EVENT.NEXT_TURN);
+//        notificarObservadores(EVENT.NEXT_TURN);
+        notificarObservadores(new EventGame(EVENT.NEXT_TURN, gameMatch.getStatus().getId()));
+    }
+
+    private void checkAndApplySanction(IRoundManager roundManager, IGameMatch gameMatch, int index) throws RemoteException {
+        if (roundManager.checkSanction(gameMatch,index)){
+            roundManager.applySanction(gameMatch,index);
+        }
+        notificarObservadores(new EventGame(EVENT.PLAYER_TAKE_HEAP, gameMatch.getStatus().getId()));
     }
 
     private void nextRoundHandler(IRoundManager roundManager, IGameMatch gameMatch) throws LostCardException, RemoteException {
         if(!gameMatch.getTurn().hasNextTurn()){
             roundManager.nextRound(gameMatch);
-            notificarObservadores(EVENT.NEXT_ROUND);
+//            notificarObservadores(EVENT.NEXT_ROUND);
+            notificarObservadores(new EventGame(EVENT.NEXT_ROUND, gameMatch.getStatus().getId()));
         }
     }
 
@@ -211,16 +232,19 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         if(!gameMatch.getRound().hasNextRound()){
             if (!gameMatch.hasWinner()){
                 roundManager.resetRound(gameMatch);
-                notificarObservadores(EVENT.RESET_GAME);
+//                notificarObservadores(EVENT.RESET_GAME);
+                notificarObservadores(new EventGame(EVENT.RESET_GAME,gameMatch.getStatus().getId()));
             }
         }
     }
 
-    private void hasWinnerHandler(IRoundManager roundManager, IGameMatch gameMatch) throws RemoteException {
+    private void hasWinnerHandler(IGameMatch gameMatch) throws RemoteException {
         if(!gameMatch.getRound().hasNextRound()){
             if (gameMatch.hasWinner()){
-                notificarObservadores(EVENT.WINNER);
+//                notificarObservadores(EVENT.WINNER);
+                notificarObservadores(new EventGame(EVENT.WINNER, gameMatch.getStatus().getId()));
             }
         }
     }
+
 }

@@ -6,7 +6,6 @@ import model.factorys.GameMatchFactory;
 import model.factorys.IGameMatchFactory;
 import model.logic.GameModel;
 import model.interfaces.IGameModel;
-
 import javax.swing.*;
 import java.rmi.RemoteException;
 

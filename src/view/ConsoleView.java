@@ -5,6 +5,9 @@ import model.enums.TYPECARD;
 import model.interfaces.ICard;
 import model.interfaces.ICenterStack;
 import model.interfaces.IPlayer;
+import model.interfaces.IPlayerPublic;
+import view.components.Message;
+import view.interfaces.IGameView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -136,10 +139,10 @@ public class ConsoleView  implements IGameView {
         frame.setVisible(true);
     }
 
-    @Override
-    public JPanel getPanel() {
-        return consolePanel;
-    }
+//    @Override
+//    public MainPanel getPanel() {
+//        return consolePanel;
+//    }
 
     @Override
     public void displayActions() {
@@ -222,10 +225,10 @@ public class ConsoleView  implements IGameView {
     }
 
     @Override
-    public void displayBoard(List<ICenterStack> centers, List<IPlayer> players) {
+    public void displayBoard(List<ICenterStack> centers, List<IPlayerPublic> players) {
         println("Board\n");
 
-        for(IPlayer player : players){
+        for(IPlayerPublic player : players){
             print(player.getUserName() + " " + player.getHealth());
             if(player.isYourTurn()){
                 println(" (playing)");
@@ -299,41 +302,41 @@ public class ConsoleView  implements IGameView {
     }
 
     @Override
-    public void waitPlayer(int players) {
-        if (players <= 0) {
-            println("No hay jugadores esperando.");
-            return;
-        }
-        StringBuilder stickmen = new StringBuilder();
-
-        // Dibujar la cantidad de stickmans solicitados
-        for (int i = 0; i < players; i++) {
-            stickmen.append("      O      ");  // Cabeza
-        }
-        stickmen.append("\n");
-
-        for (int i = 0; i < players; i++) {
-            stickmen.append("     /|\\     "); // Brazos y torso
-        }
-        stickmen.append("\n");
-
-        for (int i = 0; i < players; i++) {
-            stickmen.append("     / \\     "); // Piernas
-        }
-        stickmen.append("\n");
-
-        for (int i = 0; i < players; i++) {
-            stickmen.append("Jugador ").append(i + 1).append("  "); // Etiquetas de jugadores
-        }
-        stickmen.append("\n");
-
-        stickmen.append("\nEsperando a que ").append(players).append(" jugador(es) estén listos...\n");
-
-        // Mostrar los stickmans en el área de texto
-        println(stickmen.toString());
+    public void waitPlayer(List<IPlayerPublic> players) {
+//        if (players <= 0) {
+//            println("No hay jugadores esperando.");
+//            return;
+//        }
+//        StringBuilder stickmen = new StringBuilder();
+//
+//        // Dibujar la cantidad de stickmans solicitados
+//        for (int i = 0; i < players; i++) {
+//            stickmen.append("      O      ");  // Cabeza
+//        }
+//        stickmen.append("\n");
+//
+//        for (int i = 0; i < players; i++) {
+//            stickmen.append("     /|\\     "); // Brazos y torso
+//        }
+//        stickmen.append("\n");
+//
+//        for (int i = 0; i < players; i++) {
+//            stickmen.append("     / \\     "); // Piernas
+//        }
+//        stickmen.append("\n");
+//
+//        for (int i = 0; i < players; i++) {
+//            stickmen.append("Jugador ").append(i + 1).append("  "); // Etiquetas de jugadores
+//        }
+//        stickmen.append("\n");
+//
+//        stickmen.append("\nEsperando a que ").append(players).append(" jugador(es) estén listos...\n");
+//
+//        // Mostrar los stickmans en el área de texto
+//        println(stickmen.toString());
 
         //Ajustar actualizacion, no funciona correctamente.
-        play();
+        //play();
     }
 
 
@@ -346,17 +349,22 @@ public class ConsoleView  implements IGameView {
 
     public void play() {
         frame.getContentPane().removeAll();
-        frame.getContentPane().add(controller.getView().getPanel());
+        //frame.getContentPane().add(controller.getView().getPanel());
         frame.revalidate();
         frame.repaint();
     }
 
     @Override
+    public void chmod() {
+
+    }
+
+    @Override
     public void backToMenu() {
-        frame.getContentPane().removeAll();
-        frame.getContentPane().add(new MenuView(controller, frame).getPanel());
-        frame.revalidate();
-        frame.repaint();
+//        frame.getContentPane().removeAll();
+//        frame.getContentPane().add(new MenuView(controller, frame).getPanel());
+//        frame.revalidate();
+//        frame.repaint();
     }
 
     //    private void play(int limitPoints, int numOfPlayers){

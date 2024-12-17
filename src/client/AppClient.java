@@ -4,7 +4,10 @@ import ar.edu.unlu.rmimvc.RMIMVCException;
 import ar.edu.unlu.rmimvc.Util;
 import ar.edu.unlu.rmimvc.cliente.Cliente;
 import controller.GameController;
-import view.*;
+import utils.EventMap;
+import view.interfaces.IView;
+import view.main.MainView;
+import view.main.PopupView;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
@@ -48,14 +51,11 @@ public class AppClient {
 //                null,
 //                8888
 //        );
-        GameController controller = new GameController();
-        IView view = new InitView(controller);
-        //IGameView view = new ConsoleView(controller);
-        //controller.setView(view);
+        GameController controller = new GameController(new EventMap(), new PopupView());
+//        IView view = new MainView(controller);
         Cliente c = null;
         try {
             c = new Cliente(AppClient.IP, Integer.parseInt(port), AppClient.IP, AppClient.PORT);
-            view.init();
         } catch (NumberFormatException ex) {
             SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "Ha ocurrido un error de red, revise la configuracion.!!!",
                     "Error Red", JOptionPane.ERROR_MESSAGE));
@@ -64,6 +64,8 @@ public class AppClient {
         }
         try {
             c.iniciar(controller);
+            IView view = new MainView(controller);
+            view.init();
         } catch (RemoteException e) {
             SwingUtilities.invokeLater(()->JOptionPane.showMessageDialog(null, "Ha ocurrido un error de red, revise la configuracion.!!!",
                     "Error Red", JOptionPane.ERROR_MESSAGE));

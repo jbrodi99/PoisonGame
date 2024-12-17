@@ -3,18 +3,21 @@ package model.logic;
 import model.exceptions.NonExistsPlayerException;
 import model.exceptions.PlayerAlreadyExistsException;
 import model.interfaces.ILog;
+import model.interfaces.ISession;
+import utils.IIDGenerator;
 import utils.Serializador;
+import utils.UserIDGenerator;
 
-import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Log implements ILog, Serializable {
 
-    @Serial
     private final static String FILE_NAME_LOG = "data/Log.dat";
-    private static int idGenerator = 1;
-    private Map<String, Integer> players = null;
+    private final IIDGenerator generator = UserIDGenerator.getInstance();
+    private Map<String, Integer> players;
+    private Map<String, ISession> sessions;
     private Serializador serializador = new Serializador(Log.FILE_NAME_LOG);
 
     private static ILog instance = null;
@@ -27,9 +30,10 @@ public class Log implements ILog, Serializable {
     }
 
     private Log(){
+        //reescribir log por ids repetidos luego de crear el generador de ids
         Object[] os = (serializador.readObjects());
         players = (Map<String, Integer>) os[0];
-        idGenerator = Integer.parseInt(os[1].toString());
+        sessions = new HashMap<>();
     }
 
     @Override
@@ -42,9 +46,8 @@ public class Log implements ILog, Serializable {
         if(isPlayer(userName)){
             throw new PlayerAlreadyExistsException("The player already exists. Please Sign In or Used other name.");
         }
-        players.put(userName,idGenerator++);
+        players.put(userName,generator.nextID());
         serializador.writeOneObject(players);
-        serializador.addOneObject(idGenerator);
         players.get(userName);
     }
 
@@ -53,7 +56,21 @@ public class Log implements ILog, Serializable {
         if(!isPlayer(userName)){
             throw new NonExistsPlayerException("Non-existent player. Please Sign up previously");
         }
+        sessions.put(userName,new Session(userName, players.get(userName)));
         return players.get(userName);
     }
 
+    @Override
+    public boolean isConnect(String username) {
+        return sessions.containsKey(username);
+    }
+
+    @Override
+    public void logOut(String username) {
+        try {
+            sessions.remove(username);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("The player already disconnect.");
+        }
+    }
 }

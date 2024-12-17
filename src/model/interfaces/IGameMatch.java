@@ -4,18 +4,16 @@ import model.exceptions.LostCardException;
 
 import java.util.List;
 
-public interface IGameMatch{
+public interface IGameMatch {
 
     //Getters
+    IGameMatchStatus getStatus();
     IDeck getDeck();
     ITurn getTurn();
     IRound getRound();
     IPlayerGroup getPlayerGroup();
     ICenterStack getCenter(int pos);
     List<ICenterStack> getAllCenters();
-    int getNumOfPLayers();
-    int getLimitPoints();
-    int getId();
 
     //API
     void startGame() throws LostCardException;
