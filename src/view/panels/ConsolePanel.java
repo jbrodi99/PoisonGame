@@ -5,6 +5,7 @@ import model.interfaces.ICard;
 import model.interfaces.ICenterStack;
 import model.interfaces.IPlayer;
 import model.interfaces.IPlayerPublic;
+import utils.TextureFactory;
 import view.components.Message;
 import view.interfaces.IGameView;
 import view.main.MainView;
@@ -21,10 +22,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConsolePanel extends JPanel implements IGameView {
-    private JPanel mainPanel;
-    private CardLayout panels;
-    private MainView context;
+public class ConsolePanel extends CustomPanel implements IGameView {
     private JTextArea txtOutput;
     private JTextField txtInput;
     private JButton btnEnter;
@@ -37,12 +35,9 @@ public class ConsolePanel extends JPanel implements IGameView {
         SUIT_MAP.put("coin", 3);
     }
 
-    public ConsolePanel(JPanel parent, CardLayout panels, MainView context, LobbyConsolePanel lobby){
-        super();
-        this.mainPanel = parent;
-        this.panels = panels;
-        this.context = context;
-        this.lobby = lobby;
+    public ConsolePanel(JPanel parent, CardLayout panels, MainView context){
+        super(parent, panels, context);
+        lobby = (LobbyConsolePanel) CustomPanelFactory.createCustomPanel(parent,panels,context, PANELS.LOBBY_CONSOLE);
         initComponents();
     }
 
@@ -78,14 +73,6 @@ public class ConsolePanel extends JPanel implements IGameView {
             }
         });
 
-        // Si necesitas manejar el cierre de la ventana.
-        context.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                context.getController().disconnectPlayer();
-                System.exit(0);
-            }
-        });
     }
 
     private void processCommand() {
@@ -100,7 +87,7 @@ public class ConsolePanel extends JPanel implements IGameView {
         command = command.toLowerCase();
         if (command.startsWith("card:")){
             playCard(command);
-        } else if (command.startsWith("mode:")) {   //TODO: cambiar comando
+        } else if (command.equals("mode")) {   //TODO: cambiar comando
             chmod();
         } else if (command.startsWith("bg:")) {
             //cambiar fondo de color
@@ -361,32 +348,38 @@ public class ConsolePanel extends JPanel implements IGameView {
 //
 //        // Mostrar los stickmans en el área de texto
 //        println(stickmen.toString());
+        lobby.updateLobby(players);
+        nextPanel = PANELS.LOBBY_CONSOLE;
         this.setVisible(false);
-        panels.show(mainPanel, "lobbyC");
+        nextPanel();
     }
 
     public void play() {
         lobby.setVisible(false);
-        panels.show(mainPanel, context.getViewSelected());
+        nextPanel = PANELS.CONSOLE;
+        nextPanel();
     }
 
     @Override
     public void chmod() {
-        context.setViewSelected("graphics");
-        context.setView();
-        panels.show(mainPanel, context.getViewSelected());
+        context.getController().setView((IGameView) CustomPanelFactory.createCustomPaneltexture(mainPanel,panels,context, TextureFactory.getInstance(),PANELS.GRAPHICS));
+        nextPanel = PANELS.GRAPHICS;
+        nextPanel();
+        context.getController().refresh();
     }
 
     @Override
     public void backToMenu() {
-        this.setVisible(false);
-        panels.show(mainPanel,"menu");
+        nextPanel = PANELS.MENU;
+        nextPanel();
     }
 
     @Override
     public void displayMessage(String message) {
-        var msg = new Message(message);
-        msg.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            var msg = new Message(message);
+            msg.setVisible(true);
+        });
     }
 
     @Override

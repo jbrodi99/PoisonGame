@@ -1,4 +1,4 @@
-package model.commands;
+package model.interfaces;
 
 import model.exceptions.CardIndexOutOfBoundsException;
 import model.exceptions.InvalidTypeCardException;

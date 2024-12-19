@@ -1,6 +1,5 @@
 package controller;
 
-import model.interfaces.IPlayer;
 import model.interfaces.ICenterStack;
 import model.interfaces.IPlayerPublic;
 

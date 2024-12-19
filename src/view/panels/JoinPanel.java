@@ -1,6 +1,7 @@
 package view.panels;
 
 import model.interfaces.IGameMatchStatusPublic;
+import utils.TextureFactory;
 import view.components.MyButton;
 import view.components.MyTblModel;
 import view.components.MyTextArea;
@@ -15,44 +16,39 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class JoinPanel extends JPanel {
-    private JPanel mainPanel;
-    private CardLayout panels;
-    private MainView context;
-    private JTable table;
+public class JoinPanel extends CustomPanel {
+    private final JTable table;
     private Timer timer;
 
     public JoinPanel(JPanel parent, CardLayout panels, MainView context){
-        super();
-        this.mainPanel = parent;
-        this.panels = panels;
-        this.context = context;
+        super(parent,panels,context);
         this.table = new JTable(new MyTblModel(context.getController().getMatches()));
         initComponents();
     }
 
     private void initComponents() {
-        setVisible(false);
         setLayout(new BorderLayout());
         setOpaque(true);
         setBackground(Color.BLACK);
 
         MyTextArea txtArea = new MyTextArea("Search a game by name or id", 200,128);
-
-//        JTable table = new JTable(new MyTblModel(context.getController().getMatches()));
-
-        MyButton btnSearch = new MyButton("SEARCH",200,64);
-
+        txtArea.setTexture("src/resources/img/components/txtareaV1.png");
+        MyButton btnSearch = new MyButton(200,64, TextureFactory.getInstance());
+        btnSearch.setText("SEARCH");
+        btnSearch.setTexture("src/resources/img/components/botonV2.png");
         btnSearch.addActionListener(e -> refreshTable());
-
-        MyButton btnJoin = new MyButton("JOIN",200,64);
-
+        MyButton btnJoin = new MyButton(200,64, TextureFactory.getInstance());
+        btnJoin.setText("JOIN");
+        btnJoin.setTexture("src/resources/img/components/botonV2.png");
         btnJoin.addActionListener(e -> joinSelectedGame());
-
         JPanel btnPane = new JPanel();
+        btnPane.setBackground(Color.BLACK);
 
         add(txtArea, BorderLayout.NORTH);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        table.setBackground(Color.BLACK);
+        table.setForeground(new Color(237,140,255));
+        table.setBorder(BorderFactory.createLineBorder(new Color(237,140,255)));
+        add(table,BorderLayout.CENTER);
         btnPane.add(btnSearch);
         btnPane.add(btnJoin);
         add(btnPane, BorderLayout.SOUTH);
@@ -84,9 +80,6 @@ public class JoinPanel extends JPanel {
         int selectedRow = table.getSelectedRow();
         if (selectedRow != -1) {
             IGameMatchStatusPublic selectedMatch = ((MyTblModel) table.getModel()).getData().get(selectedRow);
-//            if (context.getController().connectPlayer(selectedMatch.getId(), context.getUsername())) {
-//                panels.show(mainPanel, context.getViewSelected());
-//            }
             context.getController().connectPlayer(selectedMatch.getId(), context.getUsername());
         } else {
             context.displayMessage("Please select a game");
@@ -94,13 +87,15 @@ public class JoinPanel extends JPanel {
     }
 
     private void startTimer(){
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                SwingUtilities.invokeLater(JoinPanel.this::refreshTable);
-            }
-        }, 0, 10000); // Actualiza cada 5 segundos
+        if (getParent() != null){
+            timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    SwingUtilities.invokeLater(JoinPanel.this::refreshTable);
+                }
+            }, 0, 10000); // Actualiza cada 5 segundos
+        }
     }
 
     private void stopTimer(){

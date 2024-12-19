@@ -1,5 +1,6 @@
 package view.panels;
 
+import utils.TextureFactory;
 import view.components.MyButton;
 import view.components.MyTextArea;
 import view.components.MyTextField;
@@ -10,92 +11,53 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class RegisterPanel extends JPanel {
-    private JPanel mainPanel;
-    private CardLayout panels;
-    private MainView context;
+public class RegisterPanel extends CustomPanel {
 
     public RegisterPanel(JPanel parent, CardLayout panels, MainView context){
-        super();
-        this.mainPanel = parent;
-        this.panels = panels;
-        this.context = context;
+        super(parent,panels,context);
+        setNextPanel(PANELS.LOGIN_AND_REGISTER);
+        CustomPanelFactory.createCustomPaneltexture(mainPanel,panels,context, TextureFactory.getInstance(),PANELS.LOGIN_AND_REGISTER);
         initComponents();
     }
 
     private void initComponents(){
-
-        setVisible(false);
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         setBackground(Color.BLACK);
 
         MyTextArea txtArea = new MyTextArea("Register with your username",500,130);
-
+        txtArea.setTexture("src/resources/img/components/txtareaV1.png");
         MyTextField txtInput = new MyTextField(200,64);
+        txtInput.setTexture("src/resources/img/components/txtFieldV6.png");
+        MyButton btnSignUp = new MyButton(200,60, TextureFactory.getInstance());
 
-        MyButton btnSignUp = new MyButton("SIGN UP",200,60);
-
-        btnSignUp.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnSignUp.setTexture("src/resources/img/botonHV1.png");
-            }
-        });
-
-        btnSignUp.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnSignUp.setTexture("src/resources/img/botonV2.png");
-            }
-        });
+        btnSignUp.setText("SIGN UP");
+        btnSignUp.setTexture("src/resources/img/components/botonV2.png");
 
         btnSignUp.addActionListener(e -> {
             String name = txtInput.getText().trim();
             if (name != null){
                 context.getController().signUp(txtInput.getText().trim());
-                this.setVisible(false);
-                panels.show(mainPanel,"lar");
+                nextPanel();
             }
         });
 
-        MyButton btnBack = new MyButton("BACK",200,60);
+        MyButton btnBack = new MyButton(200,60, TextureFactory.getInstance());
 
-        btnBack.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnBack.setTexture("src/resources/img/botonHV1.png");
-            }
-        });
-
-        btnBack.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnBack.setTexture("src/resources/img/botonV2.png");
-            }
-        });
+        btnBack.setText("BACK");
+        btnBack.setTexture("src/resources/img/components/botonV2.png");
 
         btnBack.addActionListener(e -> {
-            this.setVisible(false);
-            panels.show(mainPanel,"lar");
+            nextPanel();
         });
 
         this.add(Box.createVerticalGlue());
-
         this.add(txtArea);
-
         this.add(Box.createVerticalGlue());
-
         this.add(txtInput);
-
         this.add(Box.createVerticalGlue());
-
         this.add(btnSignUp);
-
         this.add(Box.createVerticalGlue());
-
         this.add(btnBack);
-
         this.add(Box.createVerticalGlue());
     }
-
 }

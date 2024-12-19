@@ -20,11 +20,12 @@ public class Round implements IRound, Serializable {
 
     @Override
     public void resetRound() {
-        roundsPlayed = 0;
+        roundsPlayed = 1;
     }
 
     @Override
     public boolean hasNextRound() {
         return roundsPlayed < rounds;
     }
+
 }

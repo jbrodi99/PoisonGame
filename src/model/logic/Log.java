@@ -14,11 +14,11 @@ import java.util.Map;
 
 public class Log implements ILog, Serializable {
 
-    private final static String FILE_NAME_LOG = "data/Log.dat";
+    private final static String FILE_NAME_LOG = "out/artifacts/Veneno_jar/data/Log.dat";
     private final IIDGenerator generator = UserIDGenerator.getInstance();
-    private Map<String, Integer> players;
-    private Map<String, ISession> sessions;
-    private Serializador serializador = new Serializador(Log.FILE_NAME_LOG);
+    private final Map<String, Integer> players;
+    private final Map<String, ISession> sessions;
+    private final Serializador serializador = new Serializador(Log.FILE_NAME_LOG);
 
     private static ILog instance = null;
 

@@ -2,7 +2,7 @@ package utils;
 
 public class UserIDGenerator implements IIDGenerator {
 
-    private final static String FILE_NAME_UID = "data/UserIDS.dat";
+    private final static String FILE_NAME_UID = "out/artifacts/Veneno_jar/data/UserIDS.dat";
     private Serializador serializador = new Serializador(UserIDGenerator.FILE_NAME_UID);
     private static IIDGenerator instance = null;
     private int id = 0;
@@ -15,7 +15,6 @@ public class UserIDGenerator implements IIDGenerator {
     private UserIDGenerator(){
         Object oid = serializador.readFirstObject();
         id = (int) oid;
-        System.out.println(id);
     }
 
     @Override

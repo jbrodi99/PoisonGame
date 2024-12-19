@@ -18,6 +18,8 @@ public interface IGameMatch {
     //API
     void startGame() throws LostCardException;
     void estimateDamage();
+    void removeDeadPlayers();
     boolean hasWinner();
+    IPlayer getWinner();
     void endGame();
 }

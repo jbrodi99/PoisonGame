@@ -6,8 +6,8 @@ import model.interfaces.IEventGame;
 import java.io.Serializable;
 
 public class EventGame implements IEventGame, Serializable {
-    private EVENT event;
-    private int gameID;
+    private final EVENT event;
+    private final int gameID;
 
     public EventGame(EVENT event, int gameID){
         this.event = event;

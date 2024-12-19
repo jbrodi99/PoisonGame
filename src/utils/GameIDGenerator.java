@@ -2,7 +2,7 @@ package utils;
 
 public class GameIDGenerator implements IIDGenerator{
 
-    private final static String FILE_NAME_GID = "data/GameIDS.dat";
+    private final static String FILE_NAME_GID = "out/artifacts/Veneno_jar/data/GameIDS.dat";
     private Serializador serializador = new Serializador(GameIDGenerator.FILE_NAME_GID);
     private static IIDGenerator instance = null;
     private int id = 0;
@@ -15,7 +15,6 @@ public class GameIDGenerator implements IIDGenerator{
     private GameIDGenerator(){
         Object oid = serializador.readFirstObject();
         id = (int) oid;
-        System.out.println(id);
     }
 
     @Override

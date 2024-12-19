@@ -16,11 +16,9 @@ import java.util.Random;
 
 public class Deck implements IDeck, Serializable {
 
-    private ICardFactory cardFactory;
     private final List<ICard> cards = new ArrayList<>();
 
     public Deck(ICardFactory cardFactory) {
-        this.cardFactory = cardFactory;
         for (NUMBER n : NUMBER.values()){
             for (TYPECARD t : TYPECARD.values()){
                 this.cards.add(cardFactory.createCard(n,t));
@@ -45,6 +43,7 @@ public class Deck implements IDeck, Serializable {
         for (ICenterStack c : centers){
             cards.addAll(c.emptyStack());
         }
+        shuffleDeck();
     }
 
     @Override

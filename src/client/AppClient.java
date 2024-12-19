@@ -52,7 +52,6 @@ public class AppClient {
 //                8888
 //        );
         GameController controller = new GameController(new EventMap(), new PopupView());
-//        IView view = new MainView(controller);
         Cliente c = null;
         try {
             c = new Cliente(AppClient.IP, Integer.parseInt(port), AppClient.IP, AppClient.PORT);

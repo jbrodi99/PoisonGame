@@ -1,75 +1,45 @@
 package view.panels;
 
+import utils.TextureFactory;
 import view.components.MyButton;
+import view.main.MainView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class JoinOrCreatePanel extends JPanel {
-    private JPanel mainPanel;
-    private CardLayout panels;
+public class JoinOrCreatePanel extends CustomPanel {
 
-    public JoinOrCreatePanel(JPanel parent, CardLayout panels){
-        super();
-        this.mainPanel = parent;
-        this.panels = panels;
-
+    public JoinOrCreatePanel(JPanel parent, CardLayout panels, MainView context){
+        super(parent,panels,context);
         initComponents();
     }
 
     private void initComponents() {
-        setVisible(false);
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         setOpaque(true);
         setBackground(Color.BLACK);
 
-        MyButton btnCreate = new MyButton("CREATE GAME",200,60);
-        MyButton btnSearch = new MyButton("SEARCH GAME",200,60);
+        MyButton btnCreate = new MyButton(200,60, TextureFactory.getInstance());
+        MyButton btnSearch = new MyButton(200,60, TextureFactory.getInstance());
 
-        btnCreate.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnCreate.setTexture("src/resources/img/botonHV1.png");
-//                setTexture("src/resources/img/menuGameV2.png");
-            }
-        });
-
-        btnCreate.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnCreate.setTexture("src/resources/img/botonV2.png");
-//                setTexture("src/resources/img/menuGameFondoV1.png");
-            }
-        });
+        btnCreate.setText("CREATE GAME");
+        btnSearch.setText("SEARCH GAME");
+        btnCreate.setTexture("src/resources/img/components/botonV2.png");
+        btnSearch.setTexture("src/resources/img/components/botonV2.png");
 
         btnCreate.addActionListener(e -> {
-            this.setVisible(false);
-            panels.show(mainPanel,"create");
-        });
-
-        btnSearch.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnSearch.setTexture("src/resources/img/botonHV1.png");
-//                setTexture("src/resources/img/menuGameBV2.png");
-            }
-        });
-
-        btnSearch.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnSearch.setTexture("src/resources/img/botonV2.png");
-                //setTexture("src/resources/img/menuGameFondoV1.png");
-            }
+            setNextPanel(PANELS.CREATE);
+            CustomPanelFactory.createCustomPanel(mainPanel,panels,context,PANELS.CREATE);
+            nextPanel();
         });
 
         btnSearch.addActionListener(e -> {
-            this.setVisible(false);
-            panels.show(mainPanel,"join");
+            setNextPanel(PANELS.JOIN);
+            CustomPanelFactory.createCustomPanel(mainPanel,panels,context,PANELS.JOIN);
+            nextPanel();
         });
-
 
         this.add(Box.createVerticalGlue());
         this.add(btnCreate);
@@ -77,4 +47,5 @@ public class JoinOrCreatePanel extends JPanel {
         this.add(btnSearch);
         this.add(Box.createVerticalGlue());
     }
+
 }

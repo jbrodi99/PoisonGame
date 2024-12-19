@@ -6,6 +6,5 @@ import model.interfaces.IEventGame;
 public interface IEventMap {
     void register(EVENT event, Runnable action);
     void trigger(IEventGame event, int id);
-    void unregister(EVENT event);
 }
 

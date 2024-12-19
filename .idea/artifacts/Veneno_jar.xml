@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact name="Veneno:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Veneno_jar</output-path>
+    <root id="root">
+      <element id="archive" name="Veneno.jar">
+        <element id="module-output" name="Veneno" />
+      </element>
+      <element id="library" level="project" name="LibreriaRMIMVC" />
+      <element id="dir-copy" path="$PROJECT_DIR$/out/artifacts/Veneno_jar/data" />
+    </root>
+  </artifact>
+</component>

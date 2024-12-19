@@ -15,7 +15,7 @@ public class Turn implements ITurn , Serializable {
     public static final int MOVES_PER_TURN = 4;
     private final int turnsPerRound;
     private int turnsPlayed;
-    private final Queue<IPlayer> queueTurns;
+    private Queue<IPlayer> queueTurns;
 
     public Turn(int turnsPerRound, Queue<IPlayer> queueTurns){
         this.turnsPlayed = 0;

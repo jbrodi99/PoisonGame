@@ -6,13 +6,6 @@ import model.interfaces.ICard;
 
 import java.io.Serializable;
 
-/**
- * Inmutable class Card. Used from desk to play the game.
- * Only exist one couple of "number : type_card"
- *
- * @author Rodriguez Juan Cruz
- * @version 1.0
- */
 public class Card implements ICard, Serializable {
     private final NUMBER number;
     private final TYPECARD typeCard;

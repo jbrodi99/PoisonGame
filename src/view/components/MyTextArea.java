@@ -1,5 +1,8 @@
 package view.components;
 
+import utils.ITextureFactory;
+import utils.TextureFactory;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -9,22 +12,20 @@ import java.io.IOException;
 
 public class MyTextArea extends JTextField {
 
-    private BufferedImage texture;
-    private int width;
-    private int heigth;
+    private Image imageScaled = null;
+    private final int width;
+    private final int heigth;
+    private final ITextureFactory textureFactory;
 
     public MyTextArea(String txt,int width, int height){
         super(txt);
-
         this.width = width;
         this.heigth = height;
+        textureFactory = TextureFactory.getInstance();
+        initComponent();
+    }
 
-        try {
-            texture = ImageIO.read(new File("src/resources/img/txtareaV1.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    private void initComponent(){
         setOpaque(false);
         setEditable(false);
         Dimension areaDim = new Dimension(this.width,this.heigth);
@@ -41,21 +42,33 @@ public class MyTextArea extends JTextField {
     }
 
     public void setTexture(String path){
-        try {
-            texture = ImageIO.read(new File(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }    }
+        SwingWorker<Image, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Image doInBackground() {
+                return textureFactory.createTexture(path,width,heigth);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    imageScaled = get();
+                    revalidate();
+                    repaint();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.execute();
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
-        if (texture != null){
-            Image imgEsc = texture.getScaledInstance(this.width,this.heigth,Image.SCALE_SMOOTH);
-            g2d.drawImage(imgEsc,0,0,getWidth(),getHeight(),this);
+        if (imageScaled != null){
+            g2d.drawImage(imageScaled,0,0,getWidth(),getHeight(),this);
         }
         super.paintComponent(g);
-        g2d.dispose();
     }
 }

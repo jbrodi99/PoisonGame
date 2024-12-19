@@ -1,5 +1,7 @@
 package controller;
 
+import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
+import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
 import model.interfaces.IGameModel;
 import model.interfaces.IPlayerPublic;
 import view.interfaces.IGameView;
@@ -14,4 +16,5 @@ public interface IGameController {
     int getPlayerID();
     int getCurrentGameID();
     List<IPlayerPublic> getAllPlayers();
+    IObservadorRemoto getObserver();
 }

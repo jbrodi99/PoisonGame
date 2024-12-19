@@ -17,8 +17,11 @@ public class ResetGameController extends SubController{
             IPlayerPublic iam = getPlayerByID();
             controller.getView().cleanBoard();
             updateBoard();
-            displayPlayerHand(iam);
-            displayPlayerGraveyard(iam);
+            if (iam.isAlive())
+            {
+                displayPlayerHand(iam);
+                displayPlayerGraveyard(iam);
+            }
         } catch (RemoteException e) {
             controller.getView().displayMessage(e.getMessage());
         }

@@ -2,16 +2,20 @@ package controller;
 
 import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
+import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
 import model.enums.EVENT;
 import model.exceptions.*;
 import model.interfaces.*;
+import model.logic.Ranking;
 import utils.*;
 import view.interfaces.IGameView;
 import view.interfaces.IView;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameController implements IControladorRemoto, IGameController {
     private IView popup;
@@ -25,6 +29,11 @@ public class GameController implements IControladorRemoto, IGameController {
         this.eventMap = eventMap;
         this.popup = popup;
         registerEvents();
+    }
+
+    @Override
+    public IObservadorRemoto getObserver() {
+        return this;
     }
 
     @Override
@@ -89,9 +98,6 @@ public class GameController implements IControladorRemoto, IGameController {
         try {
             playerID = model.signIn(userName);
             status = true;
-            System.out.println(playerID);
-            System.out.println(status);
-            System.out.println(userName);
         } catch (NonExistsPlayerException | RemoteException e) {
             popup.displayMessage(e.getMessage());
         }
@@ -133,7 +139,8 @@ public class GameController implements IControladorRemoto, IGameController {
 
     public void disconnectPlayer() {
         try {
-            model.close(this,playerID);
+            model.saveGame();
+            model.close(this,currentGameId,playerID);
         } catch (RemoteException e) {
             popup.displayMessage(e.getMessage());
         }
@@ -174,21 +181,41 @@ public class GameController implements IControladorRemoto, IGameController {
     public void saveGame() {
     }
 
-//    public Map<String, Integer> getRanking() throws RemoteException {
-//        return model.getRanking().getScore();
-//    }
+    public List<Map.Entry<String, Integer>> getRankingTable()  {
+        List<Map.Entry<String, Integer>> table = new ArrayList<>();
+        try {
+            table =  model.getRankingTable();
+        } catch (RemoteException e) {
+            popup.displayMessage(e.getMessage());
+        }
+        return table;
+    }
+
+    public List<Ranking.SerializableEntry> getTopFive() {
+        List<Ranking.SerializableEntry> top = new ArrayList<>();
+        try {
+            top =  model.getTopFive();
+        } catch (RemoteException e) {
+            popup.displayMessage(e.getMessage());
+        }
+        return top;
+    }
+
+    public void refresh() {
+        SubController refreshController = new RefreshController(this);
+        refreshController.run();
+
+    }
 
     private void registerEvents() {
         eventMap.register(EVENT.ALL_PLAYERS_CONNECT, new AllPlayersConnectController(this));
-        eventMap.register(EVENT.DISCONNECT_PLAYER, new DisconnectPlayerController(this));
         eventMap.register(EVENT.CONNECT_PLAYER, new ConnectPlayerController(this));
         eventMap.register(EVENT.PLAYER_PLAYED_CARD, new PlayerPlayedCardController(this));
         eventMap.register(EVENT.NEXT_TURN, new NextTurnController(this));
         eventMap.register(EVENT.NEXT_ROUND, new NextRoundController(this));
-        eventMap.register(EVENT.LOAD_GAME, new LoadGameController(this));
-        eventMap.register(EVENT.SAVE_GAME, new SaveGameController(this));
         eventMap.register(EVENT.RESET_GAME, new ResetGameController(this));
         eventMap.register(EVENT.PLAYER_TAKE_HEAP, new PlayerTakeHeapController(this));
+        eventMap.register(EVENT.CLOSE_GAME, new CloseGameController(this));
         eventMap.register(EVENT.WINNER, new WinnerController(this));
     }
 }

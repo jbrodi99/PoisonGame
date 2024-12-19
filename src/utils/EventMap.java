@@ -35,9 +35,4 @@ public class EventMap implements IEventMap, Serializable {
         }
     }
 
-    // Elimina un evento registrado
-    @Override
-    public void unregister(EVENT event) {
-        eventMap.remove(event);
-    }
 }

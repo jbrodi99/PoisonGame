@@ -1,8 +1,5 @@
 package view.panels;
 
-/*
- * Draggable.java
- */
 import view.main.MainView;
 
 import java.awt.*;
@@ -58,13 +55,6 @@ public class Draggable extends JComponent {
     private class MouseHandler extends MouseInputAdapter {
         @Override
         public void mouseDragged(final MouseEvent e) {
-//            if (action){
-//                Point pointDragged = e.getPoint();
-//                Point loc = getLocation();
-//                loc.translate(pointDragged.x - pointPressed.x,
-//                        pointDragged.y - pointPressed.y);
-//                setLocation(loc);
-//            }
             if (action && !isDragging) {
                 isDragging = true;
                 SwingUtilities.invokeLater(() -> {
@@ -73,20 +63,20 @@ public class Draggable extends JComponent {
                     loc.translate(pointDragged.x - pointPressed.x, pointDragged.y - pointPressed.y);
                     setLocation(loc);
                     isDragging = false;
+                    repaint();
                 });
             }
         }
         @Override
         public void mousePressed(final MouseEvent e) {
             pointPressed = e.getPoint();
+            disableRepaint();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-//            super.mouseReleased(e);
-//            Point pointReleased = e.getPoint();
+            enableRepaint();
             Point pointReleased = SwingUtilities.convertPoint(Draggable.this, e.getPoint(), getParent());
-            Point loc = getLocation();
             setLocation(originalLocation);
             int indexCenter = 0;
             int indexCard = 0;
@@ -97,7 +87,6 @@ public class Draggable extends JComponent {
                             Point realPos = originalLocation.getLocation();
                             realPos.translate(60,0);
                             if (card.getBounds().contains(realPos)){
-                                System.out.println("jugando la carta : " + indexCard + " en el centro : " + indexCenter);
                                 context.getController().playTurn(indexCard,indexCenter);
                             }
                             indexCard++;
@@ -108,37 +97,16 @@ public class Draggable extends JComponent {
             }
         }
     }
-    //for testing only:
-    public static void main(final String[] args) {
-        Runnable gui = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(
-                            UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception ex) {
-                }
-//                JFrame f = new JFrame("Draggable Components");
-//                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//                f.setSize(300, 300);
-//                f.setLocationRelativeTo(null);
-//                JPanel panel = new JPanel(null);
-//                JLabel label = new JLabel("Hello World");
-//                Draggable d1 = new Draggable(label, 50, 50);
-//                panel.add(d1);
-//                JTextField textfield = new JTextField("JTextField");
-//                Draggable d2 = new Draggable(textfield, 150, 150);
-//                d2.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-//                panel.add(d2);
-//                JTable table = new JTable(2, 2);
-//                Draggable d3 = new Draggable(table, 50, 200);
-//                d3.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-//                panel.add(d3);
-//                f.add(panel);
-//                f.setVisible(true);
-            }
-        };
-        //GUI must start on EventDispatchThread:
-        SwingUtilities.invokeLater(gui);
+
+    public void disableRepaint(){
+        for (Component component : context.getComponents()){
+            component.setIgnoreRepaint(true);
+        }
+    }
+
+    public void enableRepaint(){
+        for (Component component : context.getComponents()){
+            component.setIgnoreRepaint(false);
+        }
     }
 }

@@ -10,7 +10,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TextureFactory implements ITextureFactory{
 
+
+    private static ITextureFactory instance = null;
     private final Map<String, Image> textureCached = new ConcurrentHashMap<>();
+
+    public static ITextureFactory getInstance() {
+        if (instance == null){
+            instance = new TextureFactory();
+        }
+        return instance;
+    }
+
+    private TextureFactory(){
+    }
 
     @Override
     public Image createTexture(String type, String number, int width, int height) {
@@ -29,6 +41,15 @@ public class TextureFactory implements ITextureFactory{
         }
         return textureCached.get(path);
     }
+
+    @Override
+    public Image createTexture(String path, int width, int height) {
+        if (!textureCached.containsKey(path)){
+            loadTexture(path,width,height);
+        }
+        return textureCached.get(path);
+    }
+
 
     private void loadTexture(String path, int width, int height){
         BufferedImage imageIO;

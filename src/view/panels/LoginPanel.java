@@ -1,5 +1,6 @@
 package view.panels;
 
+import utils.TextureFactory;
 import view.components.MyButton;
 import view.components.MyTextArea;
 import view.components.MyTextField;
@@ -7,97 +8,55 @@ import view.main.MainView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-public class LoginPanel extends JPanel {
-    private JPanel mainPanel;
-    private CardLayout panels;
-    private MainView context;
+public class LoginPanel extends CustomPanel {
 
     public LoginPanel(JPanel parent,CardLayout panels,MainView context){
-        super();
-
-        this.mainPanel = parent;
-        this.panels = panels;
-        this.context = context;
-
+        super(parent,panels,context);
         initComponents();
     }
 
     private void initComponents(){
-
-        setVisible(false);
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         setBackground(Color.BLACK);
 
         MyTextArea txtArea = new MyTextArea("Enter with your username",500,130);
-
+        txtArea.setTexture("src/resources/img/components/txtareaV1.png");
         MyTextField txtInput = new MyTextField(200,64);
+        txtInput.setTexture("src/resources/img/components/txtFieldV6.png");
+        MyButton btnSignIn = new MyButton(200,60, TextureFactory.getInstance());
+        MyButton btnBack = new MyButton(200,60, TextureFactory.getInstance());
 
-        MyButton btnSignIn = new MyButton("SIGN IN",200,60);
-
-        MyButton btnBack = new MyButton("BACK",200,60);
-
-        btnSignIn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnSignIn.setTexture("src/resources/img/botonHV1.png");
-            }
-        });
-
-        btnSignIn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnSignIn.setTexture("src/resources/img/botonV2.png");
-            }
-        });
+        btnSignIn.setText("SIGN IN");
+        btnSignIn.setTexture("src/resources/img/components/botonV2.png");
+        btnBack.setText("BACK");
+        btnBack.setTexture("src/resources/img/components/botonV2.png");
 
         btnSignIn.addActionListener(e -> {
             context.setUsername(txtInput.getText().trim());
             if (context.getController().signIn(context.getUsername())){
-                this.setVisible(false);
-                panels.show(mainPanel,"menu");
-            }
-        });
-
-        btnBack.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnBack.setTexture("src/resources/img/botonHV1.png");
-            }
-        });
-
-        btnBack.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnBack.setTexture("src/resources/img/botonV2.png");
+                setNextPanel(PANELS.MENU);
+                CustomPanelFactory.createCustomPaneltexture(mainPanel,panels,context,TextureFactory.getInstance(),PANELS.MENU);
+                CustomPanelFactory.removePanel(PANELS.LOGIN_AND_REGISTER);
+                CustomPanelFactory.removePanel(PANELS.REGISTER);
+                nextPanel();
             }
         });
 
         btnBack.addActionListener(e -> {
-            this.setVisible(false);
-            panels.show(mainPanel,"lar");
+            setNextPanel(PANELS.LOGIN_AND_REGISTER);
+            CustomPanelFactory.createCustomPaneltexture(mainPanel,panels,context, TextureFactory.getInstance(),PANELS.LOGIN_AND_REGISTER);
+            nextPanel();
         });
         
-        this.add(Box.createVerticalGlue());
-
-        this.add(txtArea);
-
-        this.add(Box.createVerticalGlue());
-
-        this.add(txtInput);
-
-        this.add(Box.createVerticalGlue());
-
-        this.add(btnSignIn);
-
-        this.add(Box.createVerticalGlue());
-
-        this.add(btnBack);
-
-        this.add(Box.createVerticalGlue());
-
+        add(Box.createVerticalGlue());
+        add(txtArea);
+        add(Box.createVerticalGlue());
+        add(txtInput);
+        add(Box.createVerticalGlue());
+        add(btnSignIn);
+        add(Box.createVerticalGlue());
+        add(btnBack);
+        add(Box.createVerticalGlue());
     }
-
 }

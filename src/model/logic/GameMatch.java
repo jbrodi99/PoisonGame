@@ -78,11 +78,21 @@ public class GameMatch implements IGameMatch, Serializable {
         return turn.getPlayersAlive().size() == 1;
     }
 
-    //Cheaquear si esta responsabilidad es del juego
+    @Override
+    public IPlayer getWinner() {
+        return turn.getPlayersAlive().get(0);
+    }
+
     @Override
     public void estimateDamage() {
         for(IPlayer p : turn.getPlayersAlive()){
             p.receiveDamage(p.countPoison());
+        }
+    }
+
+    @Override
+    public void removeDeadPlayers() {
+        for(IPlayer p : turn.getPlayersAlive()){
             if(!p.isAlive() && turn.getPlayersAlive().size() > 1){
                 turn.removePlayer(p);
             }

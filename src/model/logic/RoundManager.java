@@ -76,11 +76,17 @@ public class RoundManager implements IRoundManager, Serializable {
                         .getPlayersAlive(),
                 gameMatch.getAllCenters()
                 );
+        for (IPlayer player : gameMatch.getTurn().getPlayersAlive()) {
+            System.out.println(player.getId());
+        }
+        gameMatch.removeDeadPlayers();
+        System.out.println("se reseteo el juego");
         gameMatch.getDeck().dealHand(
                 gameMatch
                         .getTurn()
                         .getPlayersAlive()
                 );
+
     }
 
     @Override
