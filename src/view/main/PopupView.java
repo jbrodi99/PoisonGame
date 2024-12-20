@@ -21,8 +21,10 @@ public class PopupView extends JFrame implements IView {
 
     @Override
     public void displayMessage(String message) {
-        var msg = new Message(this,message);
-        msg.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            var msg = new Message(message);
+            msg.setVisible(true);
+        });
     }
 
     @Override

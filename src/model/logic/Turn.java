@@ -55,7 +55,9 @@ public class Turn implements ITurn , Serializable {
 
     @Override
     public void addPLayer(IPlayer player) {
-        queueTurns.offer(player);
+        if (!queueTurns.contains(player)){
+            queueTurns.offer(player);
+        }
     }
 
     @Override

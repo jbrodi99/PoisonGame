@@ -1,6 +1,11 @@
 package model.interfaces;
 
+import model.logic.SavedGame;
+
+import java.util.List;
+
 public interface IGamePersistence {
-    void loadGame(IGameMatch gameMatch, IPlayerManager playerManager);
-    void saveGame(IGameMatch gameMatch, IPlayerManager playerManager);
+    List<IGameMatchStatusPublic> findGames(String username);
+    IGameMatch loadGame(int gameID);
+    void saveGame(IGameMatch gameMatch, String playerNames);
 }

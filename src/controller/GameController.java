@@ -13,9 +13,7 @@ import view.interfaces.IView;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GameController implements IControladorRemoto, IGameController {
     private IView popup;
@@ -61,6 +59,11 @@ public class GameController implements IControladorRemoto, IGameController {
     }
 
     @Override
+    public void setCurrentGameID(int newGame) {
+        currentGameId = newGame;
+    }
+
+    @Override
     public IGameModel getModel() {
         return model;
     }
@@ -82,16 +85,6 @@ public class GameController implements IControladorRemoto, IGameController {
             popup.displayMessage(e.getMessage());
         }
     }
-
-//    public boolean gameExists() {
-//        boolean exists = false;
-//        try {
-//            exists = model.isExists(currentGameId);
-//        } catch (Exception e) {
-//            popup.displayMessage(e.getMessage());
-//        }
-//        return exists;
-//    }
 
     public boolean signIn(String userName) {
         boolean status = false;
@@ -139,7 +132,7 @@ public class GameController implements IControladorRemoto, IGameController {
 
     public void disconnectPlayer() {
         try {
-            model.saveGame();
+//            model.saveGame(currentGameId);
             model.close(this,currentGameId,playerID);
         } catch (RemoteException e) {
             popup.displayMessage(e.getMessage());
@@ -158,7 +151,6 @@ public class GameController implements IControladorRemoto, IGameController {
         List<IGameMatchStatusPublic> matches = new ArrayList<>();
         try {
             matches =  model.getAllMatches();
-            System.out.println(matches);
         } catch (RemoteException e) {
             popup.displayMessage(e.getMessage());
         }
@@ -175,20 +167,23 @@ public class GameController implements IControladorRemoto, IGameController {
         return players;
     }
 
-    public void loadGame() {
-    }
-
-    public void saveGame() {
-    }
-
-    public List<Map.Entry<String, Integer>> getRankingTable()  {
-        List<Map.Entry<String, Integer>> table = new ArrayList<>();
+    public void loadGame(int gameID) {
+        currentGameId = gameID;
         try {
-            table =  model.getRankingTable();
+            model.loadGame(gameID,playerID);
         } catch (RemoteException e) {
             popup.displayMessage(e.getMessage());
         }
-        return table;
+    }
+
+    public List<IGameMatchStatusPublic> getMatchesSaved(String username){
+        List<IGameMatchStatusPublic> matches = new ArrayList<>();
+        try {
+            matches =  model.findGames(username);
+        } catch (RemoteException e) {
+            popup.displayMessage(e.getMessage());
+        }
+        return matches;
     }
 
     public List<Ranking.SerializableEntry> getTopFive() {
@@ -204,12 +199,12 @@ public class GameController implements IControladorRemoto, IGameController {
     public void refresh() {
         SubController refreshController = new RefreshController(this);
         refreshController.run();
-
     }
 
     private void registerEvents() {
         eventMap.register(EVENT.ALL_PLAYERS_CONNECT, new AllPlayersConnectController(this));
         eventMap.register(EVENT.CONNECT_PLAYER, new ConnectPlayerController(this));
+        eventMap.register(EVENT.LOAD_GAME, new ConnectPlayerController(this));
         eventMap.register(EVENT.PLAYER_PLAYED_CARD, new PlayerPlayedCardController(this));
         eventMap.register(EVENT.NEXT_TURN, new NextTurnController(this));
         eventMap.register(EVENT.NEXT_ROUND, new NextRoundController(this));

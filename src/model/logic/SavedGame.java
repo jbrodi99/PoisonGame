@@ -2,20 +2,18 @@ package model.logic;
 
 import model.interfaces.IGameMatch;
 
+
 import java.io.Serializable;
 
 public class SavedGame implements Serializable {
 
     private IGameMatch gameMatch;
-    private final String[] players = new String[4];
+    private final String[] players = {" "," "," "," "};
     private final String playerNames;
-    private static int IDGame = 0;
-    private int id;
 
     public SavedGame(IGameMatch gameMatch, String playerNames){
         this.playerNames = playerNames;
         this.gameMatch = gameMatch;
-        id = SavedGame.IDGame++;
         completePlayers();
     }
 

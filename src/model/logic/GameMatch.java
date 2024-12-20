@@ -34,11 +34,6 @@ public class GameMatch implements IGameMatch, Serializable {
     }
 
     @Override
-    public void endGame() {
-        //ver que hacer, seguramente reiniciar el estado de todo el juego.
-    }
-
-    @Override
     public IDeck getDeck() {
         return deck;
     }

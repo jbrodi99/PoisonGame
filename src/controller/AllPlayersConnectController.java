@@ -15,8 +15,6 @@ public class AllPlayersConnectController extends SubController {
     public void run() {
         try {
 
-            //TODO: notificar a la vista para cambiar el panel
-
             controller.getView().play();
 
             IPlayerPublic player = getPlayerByID();

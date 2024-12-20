@@ -8,7 +8,8 @@ public class CloseGameController extends SubController{
 
     @Override
     public void run() {
-        controller.getView().displayMessage("A player has been disconnected.\n The progress of the game will be lost.");
+        controller.setCurrentGameID(0);
+        controller.getView().displayMessage("“A player has been disconnected.\n The game progress will be saved. \nTo play again, all players must be connected”.");
         controller.getView().backToMenu();
     }
 }

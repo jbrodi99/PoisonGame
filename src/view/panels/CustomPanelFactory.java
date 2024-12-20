@@ -38,6 +38,7 @@ public class CustomPanelFactory {
             case JOIN_OR_CREATE -> new JoinOrCreatePanel(parent, panels, context);
             case JOIN -> new JoinPanel(parent, panels, context);
             case CREATE -> new CreateGamePanel(parent, panels, context);
+            case LOAD -> new LoadGamePanel(parent, panels, context);
             case LOBBY_CONSOLE -> new LobbyConsolePanel(parent, panels, context);
             case LOBBY_GRAPHICS -> new LobbyGrapichsPanel(parent, panels, context);
             case CONSOLE -> new ConsolePanel(parent, panels, context);

@@ -43,11 +43,6 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     }
 
     @Override
-    public List<Map.Entry<String, Integer>> getRankingTable()throws RemoteException {
-        return ranking.getTable();
-    }
-
-    @Override
     public List<Ranking.SerializableEntry> getTopFive() throws RemoteException{
         return ranking.getTopFivePlayers();
     }
@@ -80,9 +75,14 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     public void close(IObservadorRemoto obs,int gameID, int playerID) throws RemoteException {
         if (matches.containsKey(gameID)){
             IGameMatch match = matches.get(gameID);
-            playerManager.disconnectPlayer(match,playerID);
-            matches.remove(gameID);
-            notificarObservadores(new EventGame(EVENT.CLOSE_GAME,gameID));
+            if (getPlayerByID(gameID,playerID).isAlive()){
+                playerManager.disconnectAllPlayers(match);
+                saveGame(gameID);
+                matches.remove(gameID);
+                notificarObservadores(new EventGame(EVENT.CLOSE_GAME,gameID));
+            } else {
+                playerManager.disconnectPlayer(match,playerID);
+            }
         }
         this.removerObservador(obs);
     }
@@ -116,6 +116,15 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
         }
     }
 
+
+    private void reconnectPLayer(IGameMatch match,int playerID) throws RemoteException {
+        for (IPlayer player : match.getTurn().getPlayersAlive()) {
+            if (player.areYou(playerID)){
+                playerManager.reconnectPlayer(match,player);
+            }
+        }
+    }
+
     @Override
     public boolean isPlayerConnect(int gameID,int id) throws RemoteException {
         IGameMatch match = matches.get(gameID);
@@ -129,15 +138,31 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     }
 
     @Override
-    public void loadGame() throws RemoteException {
-        //gamePersistence.loadGame(gameMatch,playerManager);
-//        notificarObservadores(EVENT.LOAD_GAME);
+    public List<IGameMatchStatusPublic> findGames(String username) throws RemoteException {
+        return gamePersistence.findGames(username);
     }
 
     @Override
-    public void saveGame() throws RemoteException {
-        //gamePersistence.saveGame(gameMatch,playerManager);
-//        notificarObservadores(EVENT.SAVE_GAME);
+    public void loadGame(int gameID, int playerID) throws RemoteException {
+        IGameMatch match = gamePersistence.loadGame(gameID);
+        if (match != null){
+            matches.put(match.getStatus().getId(),match);
+            reconnectPLayer(match,playerID);
+            notificarObservadores(new EventGame(EVENT.LOAD_GAME,gameID));
+            if (match.getPlayerGroup().howManyPlayersAreOnline() == match.getTurn().getPlayersAlive().size()){
+                match.getStatus().setStatus(STATUS.COMPLETE);
+                notificarObservadores(new EventGame(EVENT.ALL_PLAYERS_CONNECT, match.getStatus().getId()));
+            }
+        }
+    }
+
+    @Override
+    public void saveGame(int gameID) throws RemoteException {
+        if (matches.containsKey(gameID)){
+            IGameMatch match = matches.get(gameID);
+            match.getStatus().setStatus(STATUS.WAITING);
+            gamePersistence.saveGame(match,playerManager.getNamePlayers(match));
+        }
     }
 
     @Override
@@ -149,7 +174,7 @@ public class GameModel extends ObservableRemoto implements IGameModel, Serializa
     @Override
     public List<IPlayerPublic> getAllPlayers(int gameID) throws RemoteException {
         IGameMatch match = matches.get(gameID);
-        return new ArrayList<>(match.getTurn().getPlayersAlive());
+        return new ArrayList<>(match.getPlayerGroup().getPlayers());
     }
 
     @Override

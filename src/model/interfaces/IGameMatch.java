@@ -21,5 +21,4 @@ public interface IGameMatch {
     void removeDeadPlayers();
     boolean hasWinner();
     IPlayer getWinner();
-    void endGame();
 }

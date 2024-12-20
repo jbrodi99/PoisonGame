@@ -3,13 +3,12 @@ package model.logic;
 import model.exceptions.NonExistsPlayerException;
 import model.exceptions.PlayerAlreadyExistsException;
 import model.interfaces.ILog;
-import model.interfaces.ISession;
+
 import utils.IIDGenerator;
 import utils.Serializador;
 import utils.UserIDGenerator;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Log implements ILog, Serializable {
@@ -17,7 +16,6 @@ public class Log implements ILog, Serializable {
     private final static String FILE_NAME_LOG = "out/artifacts/Veneno_jar/data/Log.dat";
     private final IIDGenerator generator = UserIDGenerator.getInstance();
     private final Map<String, Integer> players;
-    private final Map<String, ISession> sessions;
     private final Serializador serializador = new Serializador(Log.FILE_NAME_LOG);
 
     private static ILog instance = null;
@@ -33,7 +31,6 @@ public class Log implements ILog, Serializable {
         //reescribir log por ids repetidos luego de crear el generador de ids
         Object[] os = (serializador.readObjects());
         players = (Map<String, Integer>) os[0];
-        sessions = new HashMap<>();
     }
 
     @Override
@@ -56,21 +53,6 @@ public class Log implements ILog, Serializable {
         if(!isPlayer(userName)){
             throw new NonExistsPlayerException("Non-existent player. Please Sign up previously");
         }
-        sessions.put(userName,new Session(userName, players.get(userName)));
         return players.get(userName);
-    }
-
-    @Override
-    public boolean isConnect(String username) {
-        return sessions.containsKey(username);
-    }
-
-    @Override
-    public void logOut(String username) {
-        try {
-            sessions.remove(username);
-        } catch (NullPointerException e) {
-            throw new NullPointerException("The player already disconnect.");
-        }
     }
 }

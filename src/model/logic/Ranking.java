@@ -22,15 +22,15 @@ public class Ranking implements IRanking, Serializable {
         rankingTable = (Map<String, Integer>) or;
     }
 
-    @Override
-    public List<Map.Entry<String, Integer>> getTable() {
-//        return rankingTable.entrySet().stream()
+//    @Override
+//    public List<Map.Entry<String, Integer>> getTable() {
+////        return rankingTable.entrySet().stream()
+////                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+////                .toList();
+//        return new ArrayList<>(rankingTable.entrySet().stream()
 //                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-//                .toList();
-        return new ArrayList<>(rankingTable.entrySet().stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .toList());
-    }
+//                .toList());
+//    }
 
     @Override
     public List<SerializableEntry> getTopFivePlayers() {
@@ -38,11 +38,6 @@ public class Ranking implements IRanking, Serializable {
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .map(entry -> new SerializableEntry(entry.getKey(), entry.getValue()))
                 .toList();
-    }
-
-    @Override
-    public int getScore(String username) {
-        return rankingTable.get(username);
     }
 
     @Override
@@ -56,7 +51,6 @@ public class Ranking implements IRanking, Serializable {
     }
 
     public static class SerializableEntry implements Serializable {
-//        private static final long serialVersionUID = 1L;
         private final String key;
         private final Integer value;
 

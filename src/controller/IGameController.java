@@ -15,6 +15,7 @@ public interface IGameController {
     IGameModel getModel();
     int getPlayerID();
     int getCurrentGameID();
+    void setCurrentGameID(int newGame);
     List<IPlayerPublic> getAllPlayers();
     IObservadorRemoto getObserver();
 }

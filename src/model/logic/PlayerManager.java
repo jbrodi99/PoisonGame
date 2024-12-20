@@ -7,6 +7,7 @@ import model.interfaces.IPlayer;
 import model.interfaces.IPlayerManager;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class PlayerManager implements IPlayerManager, Serializable {
 
@@ -33,10 +34,24 @@ public class PlayerManager implements IPlayerManager, Serializable {
     }
 
     @Override
+    public void reconnectPlayer(IGameMatch gameMatch, IPlayer player) {
+        if (!gameMatch.getPlayerGroup().isPLayerConnect(player)){
+            gameMatch.getPlayerGroup().addPlayer(player);
+        }
+    }
+
+    @Override
     public void disconnectPlayer(IGameMatch gameMatch,int id){
         IPlayer player = getPlayerByID(gameMatch,id);
-        gameMatch.getTurn().removePlayer(player);
+//        gameMatch.getTurn().removePlayer(player);
         gameMatch.getPlayerGroup().removePlayer(player);
+    }
+
+    @Override
+    public void disconnectAllPlayers(IGameMatch gameMatch) {
+        for (IPlayer player : gameMatch.getPlayerGroup().getPlayers()) {
+            gameMatch.getPlayerGroup().removePlayer(player);
+        }
     }
 
     @Override
@@ -55,7 +70,12 @@ public class PlayerManager implements IPlayerManager, Serializable {
     }
 
     @Override
-    public String getNamePlayers() {
-        return "";
+    public String getNamePlayers(IGameMatch gameMatch) {
+        List<IPlayer>players = gameMatch.getTurn().getPlayersAlive();
+        StringBuilder names = new StringBuilder();
+        for (IPlayer player : players) {
+            names.append(player.getUserName()).append(" ");
+        }
+        return names.toString();
     }
 }

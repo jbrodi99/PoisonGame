@@ -23,11 +23,14 @@ public class JoinOrCreatePanel extends CustomPanel {
 
         MyButton btnCreate = new MyButton(200,60, TextureFactory.getInstance());
         MyButton btnSearch = new MyButton(200,60, TextureFactory.getInstance());
+        MyButton btnLoad = new MyButton(200,60, TextureFactory.getInstance());
 
         btnCreate.setText("CREATE GAME");
         btnSearch.setText("SEARCH GAME");
+        btnLoad.setText("LOAD GAME");
         btnCreate.setTexture("src/resources/img/components/botonV2.png");
         btnSearch.setTexture("src/resources/img/components/botonV2.png");
+        btnLoad.setTexture("src/resources/img/components/botonV2.png");
 
         btnCreate.addActionListener(e -> {
             setNextPanel(PANELS.CREATE);
@@ -41,10 +44,18 @@ public class JoinOrCreatePanel extends CustomPanel {
             nextPanel();
         });
 
+        btnLoad.addActionListener(e -> {
+            setNextPanel(PANELS.LOAD);
+            CustomPanelFactory.createCustomPanel(mainPanel,panels,context,PANELS.LOAD);
+            nextPanel();
+        });
+
         this.add(Box.createVerticalGlue());
         this.add(btnCreate);
         this.add(Box.createVerticalGlue());
         this.add(btnSearch);
+        this.add(Box.createVerticalGlue());
+        this.add(btnLoad);
         this.add(Box.createVerticalGlue());
     }
 

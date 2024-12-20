@@ -9,6 +9,7 @@ public enum PANELS {
     JOIN_OR_CREATE("joc"),
     JOIN("join"),
     CREATE("create"),
+    LOAD("load"),
     LOBBY_CONSOLE("lobbyC"),
     LOBBY_GRAPHICS("lobbyG"),
     CONSOLE("console"),
