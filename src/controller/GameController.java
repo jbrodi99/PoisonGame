@@ -2,7 +2,6 @@ package controller;
 
 import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
-import ar.edu.unlu.rmimvc.observer.IObservadorRemoto;
 import model.enums.EVENT;
 import model.exceptions.*;
 import model.interfaces.*;
@@ -27,16 +26,6 @@ public class GameController implements IControladorRemoto, IGameController {
         this.eventMap = eventMap;
         this.popup = popup;
         registerEvents();
-    }
-
-    @Override
-    public IObservadorRemoto getObserver() {
-        return this;
-    }
-
-    @Override
-    public IView getPopup() {
-        return popup;
     }
 
     public void setView(IGameView view) {

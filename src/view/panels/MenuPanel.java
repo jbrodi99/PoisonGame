@@ -107,9 +107,9 @@ public class MenuPanel extends CustomPanelTexture {
         });
 
         btnHowPlay.addActionListener(e -> {
-            setNextPanel(PANELS.HOW_PLAY);
-            CustomPanelFactory.createCustomPanel(mainPanel,panels,context,PANELS.HOW_PLAY);
-            nextPanel();
+//            setNextPanel(PANELS.HOW_PLAY);
+//            CustomPanelFactory.createCustomPanel(mainPanel,panels,context,PANELS.HOW_PLAY);
+//            nextPanel();
         });
 
         this.add(Box.createVerticalGlue());

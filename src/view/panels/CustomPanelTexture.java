@@ -39,12 +39,10 @@ public abstract class CustomPanelTexture extends CustomPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         if (imageScaled != null){
             g2d.drawImage(imageScaled,0,0,getWidth(),getHeight(),this);
         }
         super.paintComponent(g);
-//        g2d.dispose();
     }
 }

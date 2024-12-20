@@ -18,8 +18,7 @@ public class MainView extends JFrame implements IView {
     private GameController controller;
     private String username;
     private final CardLayout cardLayout = new CardLayout();
-    private JPanel mainPanel = new JPanel(cardLayout); // Agregamos este atributo para referenciar al panel principal.
-
+    private JPanel mainPanel = new JPanel(cardLayout);
 
     public MainView(GameController controller) {
         super();

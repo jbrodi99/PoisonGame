@@ -188,10 +188,9 @@ public class DraggableArea extends JLayeredPane {
         players.clear();
         statusPanel.removeAll();
 
-        // Eliminar los Draggables existentes de la capa y limpiar la lista
         for (Draggable draggable : hand) {
-            draggable.getParent().remove(draggable); // Elimina el componente de su contenedor
-            remove(draggable); // Elimina el componente del JLayeredPane
+            draggable.getParent().remove(draggable);
+            remove(draggable);
         }
 
         hand.clear();

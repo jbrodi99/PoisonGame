@@ -5,10 +5,6 @@ import view.main.MainView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseListener;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,17 +16,17 @@ public class CustomPanelFactory {
     public static CustomPanel createCustomPanel(JPanel parent, CardLayout panels, MainView context, PANELS panel){
 
         if (panelInstances.containsKey(panel)) {
-            // Si el panel ya está registrado, verifica si está en el parent
+
             CustomPanel existingPanel = panelInstances.get(panel);
             if (parent.isAncestorOf(existingPanel)) {
                 return existingPanel;
             }
-            // Si no está en el parent, agrégalo nuevamente
+
             parent.add(existingPanel, panel.getName());
             return existingPanel;
         }
 
-        // Crear una nueva instancia si no existe
+
         CustomPanel newPanel = switch (panel) {
             case LOGIN -> new LoginPanel(parent, panels, context);
             case REGISTER -> new RegisterPanel(parent, panels, context);
@@ -47,7 +43,7 @@ public class CustomPanelFactory {
 
         if (newPanel != null) {
             parent.add(newPanel, panel.getName());
-            panelInstances.put(panel, newPanel); // Almacenar la instancia
+            panelInstances.put(panel, newPanel);
         }
         return newPanel;
     }
@@ -55,17 +51,15 @@ public class CustomPanelFactory {
     public static CustomPanelTexture createCustomPaneltexture(JPanel parent, CardLayout panels, MainView context, ITextureFactory textureFactory, PANELS panel){
 
         if (texturePanelInstances.containsKey(panel)) {
-            // Si el panel ya está registrado, verifica si está en el parent
+
             CustomPanelTexture existingPanel = texturePanelInstances.get(panel);
             if (parent.isAncestorOf(existingPanel)) {
                 return existingPanel;
             }
-            // Si no está en el parent, agrégalo nuevamente
             parent.add(existingPanel, panel.getName());
             return existingPanel;
         }
 
-        // Crear una nueva instancia si no existe
         CustomPanelTexture newPanel = switch (panel) {
             case LOGIN_AND_REGISTER -> new LoginAndRegisterPanel(parent, panels, context, textureFactory);
             case MENU -> new MenuPanel(parent, panels, context, textureFactory);
@@ -77,7 +71,7 @@ public class CustomPanelFactory {
 
         if (newPanel != null) {
             parent.add(newPanel, panel.getName());
-            texturePanelInstances.put(panel, newPanel); // Almacenar la instancia
+            texturePanelInstances.put(panel, newPanel);
         }
         return newPanel;
     }

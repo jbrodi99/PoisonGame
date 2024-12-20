@@ -10,12 +10,10 @@ import view.interfaces.IView;
 import java.util.List;
 
 public interface IGameController {
-    IView getPopup();
     IGameView getView();
     IGameModel getModel();
     int getPlayerID();
     int getCurrentGameID();
     void setCurrentGameID(int newGame);
     List<IPlayerPublic> getAllPlayers();
-    IObservadorRemoto getObserver();
 }
